@@ -27,21 +27,21 @@
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 9999px;
       background: #0f172a;
-      border: 2px solid #ffffff;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
       cursor: pointer;
     }
     input[type="range"]::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       border-radius: 9999px;
       background: #0f172a;
-      border: 2px solid #ffffff;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      border: 2.5px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
       cursor: pointer;
     }
   </style>
@@ -50,16 +50,16 @@
 
   <!-- Header -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-base shadow-sm">
           CO₂
         </div>
         <div>
-          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+          <h1 class="text-lg sm:text-xl font-bold text-slate-900 leading-tight">
             BTB · 드라이아이스 3D 가상 실험실
           </h1>
-          <p class="text-xs text-slate-500">
+          <p class="text-xs sm:text-sm text-slate-500">
             CO₂ 용해·산성화, 르샤틀리에 원리 및 인체 호흡 평형 탐구
           </p>
         </div>
@@ -67,44 +67,51 @@
 
       <div class="flex items-center gap-2">
         <button id="btn-presentation-toggle" type="button"
-          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-1.5">
-          <span id="pres-dot" class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          class="px-3.5 py-2 rounded-lg text-sm font-semibold border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-2">
+          <span id="pres-dot" class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
           <span>발표 모드</span>
         </button>
         <button id="btn-reset-all" type="button"
-          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
+          class="px-3.5 py-2 rounded-lg text-sm font-medium border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
           실험 초기화
         </button>
       </div>
     </div>
 
-    <!-- Presentation Mode Bar (Hidden by default) -->
+    <!-- Enhanced Presentation Mode Bar -->
     <div id="presentation-bar" class="hidden bg-indigo-950 text-white border-t border-indigo-800">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1">
-            <span id="pres-step-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-600 text-white">
-              1 / 6 단계
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+        <div class="flex-1 min-w-0 space-y-2">
+          <div class="flex flex-wrap items-center gap-2.5">
+            <span id="pres-step-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-600 text-white">
+              1 / 8 단계
             </span>
-            <h2 id="pres-step-title" class="text-sm sm:text-base font-bold truncate">
+            <h2 id="pres-step-title" class="text-base sm:text-lg font-bold">
               실험 목표 및 초기 상태
             </h2>
+            <span id="pres-concept-chip" class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-200 border border-cyan-400/30">
+              초기 염기성 상태
+            </span>
           </div>
-          <p id="pres-step-script" class="text-xs sm:text-sm text-indigo-100 leading-relaxed">
-            초기 BTB 용액은 약염기성 상태(파란색)입니다. 드라이아이스를 투입했을 때 어떤 변화가 일어날지 예상해 봅시다.
+          <p id="pres-step-script" class="text-sm sm:text-base text-indigo-50 leading-relaxed">
+            발표 멘트가 여기에 표시됩니다.
           </p>
+          <div class="flex items-start gap-2 rounded-lg bg-indigo-900/70 border border-indigo-700/70 px-3 py-2 text-xs sm:text-sm text-indigo-100">
+            <span class="font-bold text-amber-300 shrink-0">관찰 포인트:</span>
+            <span id="pres-step-observe">비커 속 용액 색상을 확인하세요.</span>
+          </div>
         </div>
-        <div class="flex items-center gap-2 shrink-0">
+        <div class="flex items-center gap-2 shrink-0 self-end lg:self-center">
           <button id="btn-pres-prev" type="button"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-800 hover:bg-indigo-700 disabled:opacity-40 transition">
+            class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-indigo-800 hover:bg-indigo-700 disabled:opacity-40 transition">
             ← 이전
           </button>
           <button id="btn-pres-next" type="button"
-            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 transition">
+            class="px-3.5 py-2 rounded-lg text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 transition">
             다음 →
           </button>
           <button id="btn-pres-close" type="button"
-            class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-indigo-200 hover:text-white hover:bg-indigo-800 transition">
+            class="px-3 py-2 rounded-lg text-sm font-medium text-indigo-200 hover:text-white hover:bg-indigo-800 transition">
             종료
           </button>
         </div>
@@ -113,43 +120,49 @@
   </header>
 
   <!-- Main Content -->
-  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+  <main id="main-grid" class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-6">
 
     <!-- Left Column: Three.js 3D Viewport + Controls -->
-    <section class="lg:col-span-6 flex flex-col gap-4">
+    <section id="lab-section" class="lg:col-span-6 flex flex-col gap-4">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
-        <!-- 3D Canvas Wrapper -->
-        <div class="relative w-full h-[360px] sm:h-[430px] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+        <!-- 3D Canvas Wrapper (Larger for clear experiment observation) -->
+        <div id="canvas-wrapper" class="relative w-full h-[430px] sm:h-[500px] xl:h-[560px] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 transition-all duration-300">
           <div id="scene-container" class="w-full h-full"></div>
 
           <!-- Top-Left Live Status Overlay -->
-          <div class="absolute top-3 left-3 pointer-events-none flex flex-col gap-1.5">
-            <div class="bg-slate-950/75 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-2 text-white">
-              <div class="flex items-center gap-2">
-                <span id="hud-color-dot" class="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-white/40"></span>
-                <span id="hud-state-label" class="text-xs sm:text-sm font-bold">염기성 (파란색 계열)</span>
+          <div class="absolute top-3.5 left-3.5 pointer-events-none flex flex-col gap-2">
+            <div class="bg-slate-950/80 backdrop-blur-sm border border-white/15 rounded-xl px-3.5 py-2.5 text-white shadow-lg">
+              <div class="flex items-center gap-2.5">
+                <span id="hud-color-dot" class="w-3.5 h-3.5 rounded-full bg-blue-500 ring-2 ring-white/40"></span>
+                <span id="hud-state-label" class="text-sm sm:text-base font-bold">염기성 (파란색 계열)</span>
               </div>
-              <div class="mt-1 flex items-center gap-3 text-[11px] text-slate-300">
+              <div class="mt-1.5 flex flex-wrap items-center gap-3 text-xs sm:text-sm text-slate-200">
                 <span>개념적 CO₂ 공급: <strong id="hud-co2-val" class="text-white">10%</strong></span>
-                <span>투입된 드라이아이스: <strong id="hud-ice-count" class="text-cyan-300">0개</strong></span>
+                <span>드라이아이스: <strong id="hud-ice-count" class="text-cyan-300">0개</strong></span>
               </div>
             </div>
           </div>
 
-          <!-- Top-Right Camera Controls -->
-          <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
-            <button id="btn-reset-camera" type="button"
-              class="px-2.5 py-1.5 rounded-lg bg-slate-950/75 hover:bg-slate-900 text-white text-[11px] font-medium border border-white/15 backdrop-blur-sm transition">
-              시점 초기화
-            </button>
-            <span class="px-2 py-0.5 rounded-md bg-slate-950/60 text-[10px] text-slate-300 pointer-events-none">
+          <!-- Top-Right Camera & View Controls -->
+          <div class="absolute top-3.5 right-3.5 flex flex-col items-end gap-1.5">
+            <div class="flex items-center gap-1.5">
+              <button id="btn-expand-view" type="button"
+                class="hidden lg:inline-flex px-3 py-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-900 text-white text-xs sm:text-sm font-medium border border-white/20 backdrop-blur-sm transition">
+                실험 크게 보기
+              </button>
+              <button id="btn-reset-camera" type="button"
+                class="px-3 py-1.5 rounded-lg bg-slate-950/80 hover:bg-slate-900 text-white text-xs sm:text-sm font-medium border border-white/20 backdrop-blur-sm transition">
+                시점 초기화
+              </button>
+            </div>
+            <span class="px-2.5 py-1 rounded-md bg-slate-950/65 text-xs text-slate-200 pointer-events-none">
               드래그 360° 회전 · 스크롤 확대
             </span>
           </div>
 
           <!-- Bottom-Center Toast for Dry Ice Drop -->
           <div id="scene-toast"
-            class="hidden absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-cyan-500/90 text-slate-950 text-xs font-bold shadow-lg pointer-events-none whitespace-nowrap">
+            class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-cyan-400 text-slate-950 text-xs sm:text-sm font-bold shadow-lg pointer-events-none whitespace-nowrap">
             드라이아이스 투입! CO₂ 기포 발생 및 용해 중
           </div>
         </div>
@@ -157,17 +170,17 @@
         <!-- Experiment Controls -->
         <div class="p-4 sm:p-5 bg-white border-t border-slate-100 flex flex-col gap-4">
           <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="co2-slider" class="text-sm font-semibold text-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <label for="co2-slider" class="text-sm sm:text-base font-semibold text-slate-800">
                 CO₂ 공급량 조절 (개념적 수준)
               </label>
-              <span id="slider-val-badge" class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+              <span id="slider-val-badge" class="text-xs sm:text-sm font-bold px-2.5 py-1 rounded-md bg-slate-100 text-slate-800">
                 10 / 100
               </span>
             </div>
             <input id="co2-slider" type="range" min="0" max="100" value="10"
-              class="w-full h-2.5 rounded-lg appearance-none cursor-pointer btb-gradient" />
-            <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+              class="w-full h-3 rounded-lg appearance-none cursor-pointer btb-gradient" />
+            <div class="flex justify-between text-xs sm:text-sm text-slate-500 mt-1.5">
               <span>낮음 (파란색 · 염기성)</span>
               <span>중간 (초록색 · 중성)</span>
               <span>높음 (노란색 · 산성)</span>
@@ -176,16 +189,16 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
             <button id="btn-drop-ice" type="button"
-              class="px-3 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-1.5">
+              class="px-3.5 py-3 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-sm sm:text-base font-semibold shadow-sm transition flex items-center justify-center gap-2">
               <span>🧊</span>
               <span>드라이아이스 투입</span>
             </button>
             <button id="btn-add-co2" type="button"
-              class="px-3 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              class="px-3.5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm sm:text-base font-semibold shadow-sm transition">
               + CO₂ 추가 (+15)
             </button>
             <button id="btn-remove-co2" type="button"
-              class="px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              class="px-3.5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-base font-semibold shadow-sm transition">
               - CO₂ 제거 (-15)
             </button>
           </div>
@@ -194,86 +207,86 @@
     </section>
 
     <!-- Right Column: Tabbed Learning Panel -->
-    <section class="lg:col-span-6 flex flex-col">
+    <section id="panel-section" class="lg:col-span-6 flex flex-col">
       <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col overflow-hidden">
         <!-- Tab Headers -->
         <nav class="flex border-b border-slate-200 bg-slate-50/70 overflow-x-auto" aria-label="학습 메뉴">
           <button data-tab="equilibrium" type="button"
-            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-600 text-blue-700 bg-white transition whitespace-nowrap">
+            class="tab-btn flex-1 min-w-[105px] px-3.5 py-3.5 text-sm sm:text-base font-semibold border-b-2 border-blue-600 text-blue-700 bg-white transition whitespace-nowrap">
             화학 평형
           </button>
           <button data-tab="gases" type="button"
-            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            class="tab-btn flex-1 min-w-[105px] px-3.5 py-3.5 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
             기체 비교
           </button>
           <button data-tab="clinical" type="button"
-            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            class="tab-btn flex-1 min-w-[105px] px-3.5 py-3.5 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
             임상 사례
           </button>
           <button data-tab="quiz" type="button"
-            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            class="tab-btn flex-1 min-w-[105px] px-3.5 py-3.5 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
             이해도 퀴즈
           </button>
         </nav>
 
         <!-- Tab Panels -->
-        <div class="p-4 sm:p-5 flex-1 overflow-y-auto">
+        <div class="p-5 flex-1 overflow-y-auto">
 
           <!-- Tab 1: 화학 평형 & 르샤틀리에 원리 -->
           <div id="tab-equilibrium" class="tab-panel space-y-4">
-            <div class="rounded-xl bg-slate-900 text-white p-4">
-              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-2">
+            <div class="rounded-xl bg-slate-900 text-white p-4 sm:p-5">
+              <div class="text-xs uppercase tracking-wider text-slate-400 font-semibold mb-2.5">
                 실시간 화학 반응식 및 평형 이동
               </div>
-              <div class="space-y-1.5 text-xs sm:text-sm font-mono bg-slate-800/80 rounded-lg p-3 border border-slate-700">
+              <div class="space-y-2 text-sm sm:text-base font-mono bg-slate-800/85 rounded-lg p-3.5 border border-slate-700">
                 <div>1) CO₂(s, 드라이아이스) → CO₂(g) ⇌ CO₂(aq)</div>
                 <div>2) CO₂(aq) + H₂O(l) ⇌ H₂CO₃(aq) ⇌ H⁺(aq) + HCO₃⁻(aq)</div>
               </div>
-              <div id="eq-shift-box" class="mt-3 p-3 rounded-lg bg-blue-950/80 border border-blue-700/60 text-xs sm:text-sm">
+              <div id="eq-shift-box" class="mt-3.5 p-3.5 rounded-lg bg-blue-950/80 border border-blue-700/60 text-sm sm:text-base">
                 <div class="font-bold text-blue-300" id="eq-shift-title">
                   초기 평형 상태 (H⁺ 농도 낮음)
                 </div>
-                <p id="eq-shift-desc" class="text-slate-200 mt-1 leading-relaxed">
+                <p id="eq-shift-desc" class="text-slate-100 mt-1.5 leading-relaxed">
                   용액 속 용존 CO₂가 적어 H⁺ 이온 농도가 낮습니다. BTB 지시약은 염기성 영역인 파란색 계열을 띱니다.
                 </p>
               </div>
             </div>
 
             <!-- BTB Color Scale -->
-            <div class="rounded-xl border border-slate-200 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <h3 class="text-sm font-bold text-slate-800">BTB 지시약 색상 변화</h3>
-                <span id="btb-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+            <div class="rounded-xl border border-slate-200 p-4 sm:p-5">
+              <div class="flex items-center justify-between mb-2.5">
+                <h3 class="text-base font-bold text-slate-800">BTB 지시약 색상 변화</h3>
+                <span id="btb-badge" class="text-xs sm:text-sm font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800">
                   염기성 · 파란색
                 </span>
               </div>
-              <div class="relative h-4 rounded-full btb-gradient overflow-visible my-3">
+              <div class="relative h-4 rounded-full btb-gradient overflow-visible my-3.5">
                 <div id="btb-marker"
                   class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-slate-900 shadow-md transition-all duration-150"
                   style="left: 10%;"></div>
               </div>
-              <div class="grid grid-cols-3 text-center text-xs gap-2 pt-1">
-                <div class="p-2 rounded-lg bg-blue-50 text-blue-800">
+              <div class="grid grid-cols-3 text-center text-xs sm:text-sm gap-2.5 pt-1">
+                <div class="p-2.5 rounded-lg bg-blue-50 text-blue-800">
                   <div class="font-bold">파란색 계열</div>
-                  <div class="text-[11px]">CO₂ 적음 (염기성)</div>
+                  <div class="text-xs mt-0.5">CO₂ 적음 (염기성)</div>
                 </div>
-                <div class="p-2 rounded-lg bg-emerald-50 text-emerald-800">
+                <div class="p-2.5 rounded-lg bg-emerald-50 text-emerald-800">
                   <div class="font-bold">초록색 계열</div>
-                  <div class="text-[11px]">중간 평형 (중성)</div>
+                  <div class="text-xs mt-0.5">중간 평형 (중성)</div>
                 </div>
-                <div class="p-2 rounded-lg bg-amber-50 text-amber-800">
+                <div class="p-2.5 rounded-lg bg-amber-50 text-amber-800">
                   <div class="font-bold">노란색 계열</div>
-                  <div class="text-[11px]">CO₂ 많음 (산성)</div>
+                  <div class="text-xs mt-0.5">CO₂ 많음 (산성)</div>
                 </div>
               </div>
             </div>
 
             <!-- Human Blood Buffer Connection -->
-            <div class="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
-              <h3 class="text-sm font-bold text-indigo-950 mb-1.5">
+            <div class="rounded-xl border border-indigo-200 bg-indigo-50/70 p-4 sm:p-5">
+              <h3 class="text-base font-bold text-indigo-950 mb-2">
                 인체 호흡과 혈액의 산-염기 평형 연결
               </h3>
-              <p class="text-xs sm:text-sm text-indigo-900 leading-relaxed">
+              <p class="text-sm sm:text-base text-indigo-900 leading-relaxed">
                 우리 혈액도 동일한 탄산-중탄산 완충계(<strong>H₂CO₃ / HCO₃⁻</strong>)로 pH를 조절합니다.
                 호흡이 느려져 체내 CO₂가 쌓이면(정반응 우세) H⁺가 증가해 혈액이 산성화(<strong>호흡성 산증</strong>)되고,
                 과호흡으로 CO₂를 과도하게 내보내면(역반응 우세) H⁺가 감소해 알칼리화(<strong>호흡성 알칼리증</strong>)됩니다.
@@ -283,51 +296,51 @@
 
           <!-- Tab 2: O2, CO2, CO 비교 -->
           <div id="tab-gases" class="tab-panel hidden space-y-4">
-            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
               호흡과 밀접한 세 기체(O₂, CO₂, CO)는 혈액 내 운반 방식과 인체에 미치는 영향이 뚜렷하게 다릅니다.
             </p>
 
             <div class="overflow-x-auto rounded-xl border border-slate-200">
-              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <table class="w-full text-left border-collapse text-sm sm:text-base">
                 <thead>
                   <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
-                    <th class="p-3 font-bold">기체</th>
-                    <th class="p-3 font-bold">혈액 운반·작용</th>
-                    <th class="p-3 font-bold">이상 시 인체 영향</th>
+                    <th class="p-3.5 font-bold">기체</th>
+                    <th class="p-3.5 font-bold">혈액 운반·작용</th>
+                    <th class="p-3.5 font-bold">이상 시 인체 영향</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                   <tr class="bg-white">
-                    <td class="p-3 font-bold text-sky-700 whitespace-nowrap">O₂ (산소)</td>
-                    <td class="p-3 text-slate-700">적혈구 헤모글로빈(Hb)과 가역적으로 결합하여 조직 세포로 운반, 세포 호흡에 필수.</td>
-                    <td class="p-3 text-slate-700">부족 시 저산소증(어지럼증, 청색증, 의식 저하) 발생.</td>
+                    <td class="p-3.5 font-bold text-sky-700 whitespace-nowrap">O₂ (산소)</td>
+                    <td class="p-3.5 text-slate-700">적혈구 헤모글로빈(Hb)과 가역적으로 결합하여 조직 세포로 운반, 세포 호흡에 필수.</td>
+                    <td class="p-3.5 text-slate-700">부족 시 저산소증(어지럼증, 청색증, 의식 저하) 발생.</td>
                   </tr>
                   <tr class="bg-slate-50/60">
-                    <td class="p-3 font-bold text-amber-700 whitespace-nowrap">CO₂ (이산화탄소)</td>
-                    <td class="p-3 text-slate-700">대부분 혈장에서 중탄산 이온(HCO₃⁻) 형태로 운반되며 혈액 pH 평형 및 호흡 중추 자극에 관여.</td>
-                    <td class="p-3 text-slate-700">과다 축적 시 호흡성 산증(두통, 혼란), 과도 배출 시 호흡성 알칼리증(손발 저림).</td>
+                    <td class="p-3.5 font-bold text-amber-700 whitespace-nowrap">CO₂ (이산화탄소)</td>
+                    <td class="p-3.5 text-slate-700">대부분 혈장에서 중탄산 이온(HCO₃⁻) 형태로 운반되며 혈액 pH 평형 및 호흡 중추 자극에 관여.</td>
+                    <td class="p-3.5 text-slate-700">과다 축적 시 호흡성 산증(두통, 혼란), 과도 배출 시 호흡성 알칼리증(손발 저림).</td>
                   </tr>
                   <tr class="bg-white">
-                    <td class="p-3 font-bold text-rose-700 whitespace-nowrap">CO (일산화탄소)</td>
-                    <td class="p-3 text-slate-700">헤모글로빈과의 결합력이 산소보다 매우 높아(약 200배 이상) 산소 결합 자리를 차지함.</td>
-                    <td class="p-3 text-slate-700">혈액 내 산소 운반이 차단되어 조직 저산소증, 두통, 구토, 심각 시 생명 위험.</td>
+                    <td class="p-3.5 font-bold text-rose-700 whitespace-nowrap">CO (일산화탄소)</td>
+                    <td class="p-3.5 text-slate-700">헤모글로빈과의 결합력이 산소보다 매우 높아(약 200배 이상) 산소 결합 자리를 차지함.</td>
+                    <td class="p-3.5 text-slate-700">혈액 내 산소 운반이 차단되어 조직 저산소증, 두통, 구토, 심각 시 생명 위험.</td>
                   </tr>
                 </tbody>
               </table>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div class="p-3 rounded-xl border border-sky-200 bg-sky-50/70">
-                <div class="text-xs font-bold text-sky-900">O₂ 핵심 포인트</div>
-                <p class="text-xs text-sky-800 mt-1">산소 공급이 원활해야 세포 에너지(ATP) 생성이 정상 유지됩니다.</p>
+              <div class="p-3.5 rounded-xl border border-sky-200 bg-sky-50/70">
+                <div class="text-sm font-bold text-sky-900">O₂ 핵심 포인트</div>
+                <p class="text-xs sm:text-sm text-sky-800 mt-1 leading-relaxed">산소 공급이 원활해야 세포 에너지(ATP) 생성이 정상 유지됩니다.</p>
               </div>
-              <div class="p-3 rounded-xl border border-amber-200 bg-amber-50/70">
-                <div class="text-xs font-bold text-amber-900">CO₂ 핵심 포인트</div>
-                <p class="text-xs text-amber-800 mt-1">단순 노폐물이 아니라 혈액 산-염기 평형 조절의 핵심 물질입니다.</p>
+              <div class="p-3.5 rounded-xl border border-amber-200 bg-amber-50/70">
+                <div class="text-sm font-bold text-amber-900">CO₂ 핵심 포인트</div>
+                <p class="text-xs sm:text-sm text-amber-800 mt-1 leading-relaxed">단순 노폐물이 아니라 혈액 산-염기 평형 조절의 핵심 물질입니다.</p>
               </div>
-              <div class="p-3 rounded-xl border border-rose-200 bg-rose-50/70">
-                <div class="text-xs font-bold text-rose-900">CO 핵심 포인트</div>
-                <p class="text-xs text-rose-800 mt-1">무색·무취로 감지가 어렵고 Hb 결합을 방해하므로 환기가 필수입니다.</p>
+              <div class="p-3.5 rounded-xl border border-rose-200 bg-rose-50/70">
+                <div class="text-sm font-bold text-rose-900">CO 핵심 포인트</div>
+                <p class="text-xs sm:text-sm text-rose-800 mt-1 leading-relaxed">무색·무취로 감지가 어렵고 Hb 결합을 방해하므로 환기가 필수입니다.</p>
               </div>
             </div>
           </div>
@@ -336,20 +349,20 @@
           <div id="tab-clinical" class="tab-panel hidden space-y-4">
             <div class="flex flex-wrap gap-2">
               <button data-case="hyper" type="button"
-                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">
+                class="case-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-600 text-white transition">
                 사례 1. 과호흡 증후군
               </button>
               <button data-case="hypo" type="button"
-                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                class="case-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
                 사례 2. 저환기 (COPD 등)
               </button>
               <button data-case="co" type="button"
-                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                class="case-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
                 사례 3. 일산화탄소 중독
               </button>
             </div>
 
-            <div id="clinical-card" class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3">
+            <div id="clinical-card" class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5 space-y-3.5">
               <!-- Populated by JS -->
             </div>
           </div>
@@ -357,8 +370,8 @@
           <!-- Tab 4: 이해도 퀴즈 -->
           <div id="tab-quiz" class="tab-panel hidden space-y-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-sm font-bold text-slate-800">이해도 확인 퀴즈</h3>
-              <span id="quiz-score-badge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+              <h3 class="text-base font-bold text-slate-800">이해도 확인 퀴즈</h3>
+              <span id="quiz-score-badge" class="text-xs sm:text-sm font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
                 점수: 0 / 5
               </span>
             </div>
@@ -366,7 +379,7 @@
               <!-- Populated by JS -->
             </div>
             <button id="btn-quiz-reset" type="button"
-              class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-700 transition">
+              class="px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-sm font-semibold text-slate-700 transition">
               퀴즈 다시 풀기
             </button>
           </div>
@@ -379,7 +392,7 @@
 
   <!-- Footer Disclaimer -->
   <footer class="bg-white border-t border-slate-200 mt-auto">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 text-xs sm:text-sm text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <span>
         ※ 현재 가상 실험실은 교육용 개념 시뮬레이션입니다. 슬라이더 값은 실제 CO₂ 농도나 pH 측정값이 아니며, 실제 실험 결과를 정량적으로 재현하지는 않습니다.
       </span>
@@ -393,17 +406,18 @@
       // 1. State Management
       // ==========================================
       const state = {
-        co2Level: 10, // 0 ~ 100
+        co2Level: 10,
         activeTab: 'equilibrium',
         activeCase: 'hyper',
         presentationMode: false,
         presentationStep: 0,
         iceDroppedCount: 0,
+        expandedView: false,
         quizAnswers: {},
         camera: {
-          theta: 0.45,
-          phi: 1.15,
-          radius: 7.2,
+          theta: 0.42,
+          phi: 1.12,
+          radius: 6.35,
           isDragging: false,
           lastX: 0,
           lastY: 0
@@ -415,7 +429,7 @@
       // ==========================================
       const container = document.getElementById('scene-container');
       const scene = new THREE.Scene();
-      scene.fog = new THREE.FogExp2(0x0f172a, 0.042);
+      scene.fog = new THREE.FogExp2(0x0f172a, 0.036);
 
       const camera = new THREE.PerspectiveCamera(
         40,
@@ -430,14 +444,14 @@
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
+      renderer.toneMappingExposure = 1.16;
       container.appendChild(renderer.domElement);
 
       // Studio Laboratory Lighting
-      const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x1e293b, 0.78);
+      const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x1e293b, 0.85);
       scene.add(hemiLight);
 
-      const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
       keyLight.position.set(4.5, 8.5, 5.5);
       keyLight.castShadow = true;
       keyLight.shadow.mapSize.width = 1024;
@@ -446,20 +460,19 @@
       keyLight.shadow.camera.far = 22;
       scene.add(keyLight);
 
-      const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.75);
+      const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.82);
       rimLight.position.set(-5.5, 4.5, -4.5);
       scene.add(rimLight);
 
-      const fillLight = new THREE.DirectionalLight(0xf8fafc, 0.45);
+      const fillLight = new THREE.DirectionalLight(0xf8fafc, 0.52);
       fillLight.position.set(-3, 2, 5);
       scene.add(fillLight);
 
-      // Caustic / Solution Glow Light on the Ceramic Plate
-      const causticLight = new THREE.PointLight(0x2563eb, 0.9, 5.5);
-      causticLight.position.set(0, -1.0, 0.2);
+      const causticLight = new THREE.PointLight(0x2563eb, 1.05, 6.0);
+      causticLight.position.set(0, -1.0, 0.25);
       scene.add(causticLight);
 
-      // Procedural Textures: 1) Beaker Graduation Markings, 2) Soft Vapor Fog Sprite
+      // Procedural Textures: 1) High-Contrast Beaker Graduations, 2) Soft Vapor Fog Sprite
       function createBeakerLabelTexture() {
         const c = document.createElement('canvas');
         c.width = 1024;
@@ -467,12 +480,11 @@
         const ctx = c.getContext('2d');
         ctx.clearRect(0, 0, c.width, c.height);
 
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.78)';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-        ctx.lineWidth = 3;
-        ctx.font = 'bold 22px Inter, sans-serif';
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.lineWidth = 4;
+        ctx.font = 'bold 28px Inter, sans-serif';
 
-        // Place markings on front-facing arc of cylinder
         const centerX = 512;
         const marks = [
           { y: 400, label: '50' },
@@ -483,24 +495,23 @@
         ];
         marks.forEach((m) => {
           ctx.beginPath();
-          ctx.moveTo(centerX - 38, m.y);
-          ctx.lineTo(centerX + 18, m.y);
+          ctx.moveTo(centerX - 42, m.y);
+          ctx.lineTo(centerX + 20, m.y);
           ctx.stroke();
-          ctx.fillText(m.label, centerX + 26, m.y + 7);
+          ctx.fillText(m.label, centerX + 28, m.y + 9);
         });
 
-        // Minor ticks
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 2.5;
         for (let y = 155; y <= 400; y += 35) {
           ctx.beginPath();
-          ctx.moveTo(centerX - 24, y);
-          ctx.lineTo(centerX + 4, y);
+          ctx.moveTo(centerX - 26, y);
+          ctx.lineTo(centerX + 6, y);
           ctx.stroke();
         }
 
-        ctx.font = '600 18px Inter, sans-serif';
-        ctx.fillStyle = 'rgba(226, 232, 240, 0.72)';
-        ctx.fillText('BOROSILICATE 3.3', centerX - 75, 455);
+        ctx.font = '700 20px Inter, sans-serif';
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.85)';
+        ctx.fillText('BOROSILICATE 3.3', centerX - 88, 458);
 
         const tex = new THREE.CanvasTexture(c);
         tex.anisotropy = 4;
@@ -512,9 +523,9 @@
         c.width = 128;
         c.height = 128;
         const ctx = c.getContext('2d');
-        const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 62);
-        grad.addColorStop(0, 'rgba(241, 245, 249, 0.85)');
-        grad.addColorStop(0.45, 'rgba(226, 232, 240, 0.35)');
+        const grad = ctx.createRadialGradient(64, 64, 8, 64, 64, 62);
+        grad.addColorStop(0, 'rgba(248, 250, 252, 0.95)');
+        grad.addColorStop(0.45, 'rgba(226, 232, 240, 0.45)');
         grad.addColorStop(1, 'rgba(226, 232, 240, 0.0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 128, 128);
@@ -524,7 +535,7 @@
       const fogTexture = createFogTexture();
 
       // Laboratory Benchtop
-      const benchGeo = new THREE.CylinderGeometry(7.5, 7.5, 0.3, 64);
+      const benchGeo = new THREE.CylinderGeometry(8.0, 8.0, 0.3, 64);
       const benchMat = new THREE.MeshStandardMaterial({
         color: 0x0f172a,
         roughness: 0.72,
@@ -535,7 +546,7 @@
       benchMesh.receiveShadow = true;
       scene.add(benchMesh);
 
-      // Magnetic Stirrer Base (Realistic Lab Equipment)
+      // Magnetic Stirrer Base
       const stirrerGroup = new THREE.Group();
       scene.add(stirrerGroup);
 
@@ -551,7 +562,6 @@
       stirrerBody.castShadow = true;
       stirrerGroup.add(stirrerBody);
 
-      // White Ceramic Top Plate (reflects BTB solution color!)
       const plateGeo = new THREE.CylinderGeometry(1.52, 1.54, 0.07, 48);
       const plateMat = new THREE.MeshStandardMaterial({
         color: 0xf8fafc,
@@ -563,8 +573,7 @@
       plateMesh.receiveShadow = true;
       stirrerGroup.add(plateMesh);
 
-      // Power indicator LED on Stirrer Front
-      const ledGeo = new THREE.SphereGeometry(0.045, 12, 12);
+      const ledGeo = new THREE.SphereGeometry(0.05, 12, 12);
       const ledMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
       const ledMesh = new THREE.Mesh(ledGeo, ledMat);
       ledMesh.position.set(0.45, -1.84, 1.78);
@@ -593,7 +602,6 @@
       clampArm.position.set(-1.28, 1.95, -0.48);
       standGroup.add(clampArm);
 
-      // Sensor Probe Body dipping into BTB solution
       const probeBodyGeo = new THREE.CylinderGeometry(0.065, 0.055, 2.35, 20);
       const probeBodyMat = new THREE.MeshStandardMaterial({
         color: 0x1e293b,
@@ -605,7 +613,7 @@
       probeMesh.rotation.z = -0.06;
       standGroup.add(probeMesh);
 
-      const probeTipGeo = new THREE.SphereGeometry(0.058, 16, 16);
+      const probeTipGeo = new THREE.SphereGeometry(0.06, 16, 16);
       const probeTipMat = new THREE.MeshPhysicalMaterial({
         color: 0xbae6fd,
         transparent: true,
@@ -617,8 +625,7 @@
       probeTip.position.set(-0.79, -0.29, -0.18);
       standGroup.add(probeTip);
 
-      // Probe Top Status LED
-      const probeLedGeo = new THREE.CylinderGeometry(0.072, 0.072, 0.08, 20);
+      const probeLedGeo = new THREE.CylinderGeometry(0.075, 0.075, 0.09, 20);
       const probeLedMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
       const probeLed = new THREE.Mesh(probeLedGeo, probeLedMat);
       probeLed.position.set(-0.65, 2.04, -0.18);
@@ -632,7 +639,6 @@
       const beakerRadius = 1.32;
       const beakerHeight = 3.05;
 
-      // Studio Glass Material
       const glassMat = new THREE.MeshPhysicalMaterial({
         color: 0xe0f2fe,
         transparent: true,
@@ -651,38 +657,35 @@
       wallMesh.position.y = -0.08;
       beakerGroup.add(wallMesh);
 
-      // Printed Graduation Overlay Cylinder
-      const labelGeo = new THREE.CylinderGeometry(beakerRadius + 0.004, beakerRadius * 0.96 + 0.004, beakerHeight * 0.92, 64, 1, true);
+      const labelGeo = new THREE.CylinderGeometry(beakerRadius + 0.005, beakerRadius * 0.96 + 0.005, beakerHeight * 0.92, 64, 1, true);
       const labelMat = new THREE.MeshBasicMaterial({
         map: createBeakerLabelTexture(),
         transparent: true,
-        opacity: 0.85,
+        opacity: 0.92,
         depthWrite: false,
-        side: THREE.DoubleSide
+        side: THREE.FrontSide
       });
       const labelMesh = new THREE.Mesh(labelGeo, labelMat);
       labelMesh.position.y = -0.12;
-      labelMesh.rotation.y = -Math.PI / 2;
+      labelMesh.rotation.y = -0.25;
       beakerGroup.add(labelMesh);
 
-      // Thick Glass Base Puck
       const bottomGlassGeo = new THREE.CylinderGeometry(beakerRadius * 0.96, beakerRadius * 0.96, 0.1, 64);
       const bottomGlassMesh = new THREE.Mesh(bottomGlassGeo, new THREE.MeshPhysicalMaterial({
         color: 0xbae6fd,
         transparent: true,
-        opacity: 0.42,
+        opacity: 0.44,
         roughness: 0.08,
         clearcoat: 1.0
       }));
       bottomGlassMesh.position.y = -1.56;
       beakerGroup.add(bottomGlassMesh);
 
-      // Beaker Top Rim (3D Torus)
-      const rimGeo = new THREE.TorusGeometry(beakerRadius, 0.058, 18, 64);
+      const rimGeo = new THREE.TorusGeometry(beakerRadius, 0.06, 18, 64);
       const rimMat = new THREE.MeshPhysicalMaterial({
         color: 0xe0f2fe,
         transparent: true,
-        opacity: 0.68,
+        opacity: 0.72,
         roughness: 0.05,
         clearcoat: 1.0
       });
@@ -692,7 +695,7 @@
       beakerGroup.add(rimMesh);
 
       // PTFE Magnetic Stir Bar inside Beaker
-      const stirBarGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.42, 16);
+      const stirBarGeo = new THREE.CylinderGeometry(0.058, 0.058, 0.44, 16);
       const stirBarMat = new THREE.MeshStandardMaterial({
         color: 0xffffff,
         roughness: 0.25,
@@ -710,7 +713,7 @@
       const liquidMat = new THREE.MeshPhysicalMaterial({
         color: 0x2563eb,
         transparent: true,
-        opacity: 0.74,
+        opacity: 0.76,
         roughness: 0.08,
         metalness: 0.02,
         clearcoat: 0.85,
@@ -720,12 +723,11 @@
       liquidMesh.position.y = -1.51 + liquidHeight / 2;
       beakerGroup.add(liquidMesh);
 
-      // Liquid Top Surface + Meniscus Ring
       const surfaceGeo = new THREE.CircleGeometry(liquidRadius, 64);
       const surfaceMat = new THREE.MeshPhysicalMaterial({
         color: 0x3b82f6,
         transparent: true,
-        opacity: 0.86,
+        opacity: 0.88,
         roughness: 0.06,
         clearcoat: 1.0,
         side: THREE.DoubleSide
@@ -735,25 +737,25 @@
       surfaceMesh.position.y = -1.51 + liquidHeight + 0.005;
       beakerGroup.add(surfaceMesh);
 
-      const meniscusGeo = new THREE.TorusGeometry(liquidRadius - 0.01, 0.022, 12, 64);
+      const meniscusGeo = new THREE.TorusGeometry(liquidRadius - 0.01, 0.025, 12, 64);
       const meniscusMat = new THREE.MeshBasicMaterial({
         color: 0x93c5fd,
         transparent: true,
-        opacity: 0.55
+        opacity: 0.6
       });
       const meniscusMesh = new THREE.Mesh(meniscusGeo, meniscusMat);
       meniscusMesh.rotation.x = Math.PI / 2;
       meniscusMesh.position.y = -1.51 + liquidHeight + 0.01;
       beakerGroup.add(meniscusMesh);
 
-      // Splash Ripple Rings when Dry Ice hits liquid
+      // Splash Ripple Rings
       const ripples = [];
       function spawnRipple() {
-        const rGeo = new THREE.RingGeometry(0.08, 0.14, 32);
+        const rGeo = new THREE.RingGeometry(0.1, 0.18, 32);
         const rMat = new THREE.MeshBasicMaterial({
           color: 0xffffff,
           transparent: true,
-          opacity: 0.85,
+          opacity: 0.9,
           side: THREE.DoubleSide
         });
         const rMesh = new THREE.Mesh(rGeo, rMat);
@@ -763,32 +765,31 @@
         ripples.push({ mesh: rMesh, mat: rMat, scale: 1.0 });
       }
 
-      // Dry Ice Chunks Array (Crystalline falling & sublimating)
+      // Dry Ice Chunks (larger & more visible)
       const dryIceChunks = [];
       const iceMat = new THREE.MeshStandardMaterial({
         color: 0xf8fafc,
-        roughness: 0.58,
+        roughness: 0.52,
         metalness: 0.04,
         emissive: 0xbae6fd,
-        emissiveIntensity: 0.28
+        emissiveIntensity: 0.35
       });
 
       function spawnDryIceChunk() {
         const chunkGroup = new THREE.Group();
-        const mainGeo = new THREE.DodecahedronGeometry(0.2 + Math.random() * 0.06, 0);
+        const mainGeo = new THREE.DodecahedronGeometry(0.24 + Math.random() * 0.06, 0);
         const mainMesh = new THREE.Mesh(mainGeo, iceMat);
         chunkGroup.add(mainMesh);
 
-        // Add smaller crystalline facet for realistic irregular dry ice look
-        const subGeo = new THREE.IcosahedronGeometry(0.12, 0);
+        const subGeo = new THREE.IcosahedronGeometry(0.14, 0);
         const subMesh = new THREE.Mesh(subGeo, iceMat);
-        subMesh.position.set(0.11, 0.06, -0.05);
+        subMesh.position.set(0.13, 0.07, -0.06);
         chunkGroup.add(subMesh);
 
         chunkGroup.position.set(
-          (Math.random() - 0.5) * 0.65,
-          2.65,
-          (Math.random() - 0.5) * 0.65
+          (Math.random() - 0.5) * 0.55,
+          2.75,
+          (Math.random() - 0.5) * 0.55
         );
         chunkGroup.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
         beakerGroup.add(chunkGroup);
@@ -802,31 +803,31 @@
         });
       }
 
-      // CO2 Bubbles inside Liquid (more detailed & buoyant)
+      // CO2 Bubbles inside Liquid (larger & brighter for clear visibility)
       const bubbles = [];
-      const bubbleGeo = new THREE.SphereGeometry(0.042, 14, 14);
+      const bubbleGeo = new THREE.SphereGeometry(0.052, 14, 14);
       const bubbleMat = new THREE.MeshPhysicalMaterial({
         color: 0xffffff,
         transparent: true,
-        opacity: 0.78,
-        roughness: 0.05,
+        opacity: 0.85,
+        roughness: 0.04,
         clearcoat: 1.0
       });
 
-      for (let i = 0; i < 60; i++) {
+      for (let i = 0; i < 65; i++) {
         const bMesh = new THREE.Mesh(bubbleGeo, bubbleMat);
         resetBubble(bMesh, true);
         beakerGroup.add(bMesh);
         bubbles.push({
           mesh: bMesh,
-          speed: 0.013 + Math.random() * 0.022,
+          speed: 0.014 + Math.random() * 0.022,
           wobbleOffset: Math.random() * Math.PI * 2,
-          baseScale: 0.45 + Math.random() * 0.9
+          baseScale: 0.5 + Math.random() * 0.95
         });
       }
 
       function resetBubble(mesh, randomY) {
-        if (!randomY && dryIceChunks.length > 0 && Math.random() < 0.72) {
+        if (!randomY && dryIceChunks.length > 0 && Math.random() < 0.75) {
           const target = dryIceChunks[Math.floor(Math.random() * dryIceChunks.length)];
           mesh.position.x = target.mesh.position.x + (Math.random() - 0.5) * 0.25;
           mesh.position.z = target.mesh.position.z + (Math.random() - 0.5) * 0.25;
@@ -842,12 +843,12 @@
           : -1.42 + Math.random() * 0.22;
       }
 
-      // Volumetric-looking CO2 Vapor Sprites (spilling over rim & sinking!)
+      // Volumetric-looking CO2 Vapor Sprites (spilling over rim & sinking)
       const mistParticles = [];
-      for (let i = 0; i < 28; i++) {
+      for (let i = 0; i < 32; i++) {
         const sMat = new THREE.SpriteMaterial({
           map: fogTexture,
-          color: 0xf1f5f9,
+          color: 0xf8fafc,
           transparent: true,
           opacity: 0.0,
           depthWrite: false
@@ -873,24 +874,39 @@
           randomProgress ? 0.55 + Math.random() * 0.9 : 0.5,
           Math.sin(angle) * r
         );
-        const s = 0.55 + Math.random() * 0.55;
+        const s = 0.62 + Math.random() * 0.55;
         sprite.scale.set(s, s, 1);
       }
 
       // ==========================================
-      // 3. 360-Degree Camera Orbit & Zoom
+      // 3. 360-Degree Camera Orbit & Smooth Transitions
       // ==========================================
+      let targetCamera = null;
+
       function updateCameraPosition() {
         const { theta, phi, radius } = state.camera;
         camera.position.x = radius * Math.sin(phi) * Math.sin(theta);
         camera.position.y = radius * Math.cos(phi);
         camera.position.z = radius * Math.sin(phi) * Math.cos(theta);
-        camera.lookAt(0, -0.15, 0);
+        camera.lookAt(0, -0.1, 0);
       }
       updateCameraPosition();
 
+      function focusCamera(theta, phi, radius) {
+        targetCamera = { theta, phi, radius };
+      }
+
+      function resizeRenderer() {
+        const w = container.clientWidth;
+        const h = Math.max(container.clientHeight, 1);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      }
+
       const dom = renderer.domElement;
       dom.addEventListener('pointerdown', (e) => {
+        targetCamera = null;
         state.camera.isDragging = true;
         state.camera.lastX = e.clientX;
         state.camera.lastY = e.clientY;
@@ -916,17 +932,12 @@
 
       dom.addEventListener('wheel', (e) => {
         e.preventDefault();
-        state.camera.radius = Math.max(4.4, Math.min(11.0, state.camera.radius + e.deltaY * 0.005));
+        targetCamera = null;
+        state.camera.radius = Math.max(4.0, Math.min(10.5, state.camera.radius + e.deltaY * 0.005));
         updateCameraPosition();
       }, { passive: false });
 
-      window.addEventListener('resize', () => {
-        const w = container.clientWidth;
-        const h = Math.max(container.clientHeight, 1);
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        renderer.setSize(w, h);
-      });
+      window.addEventListener('resize', resizeRenderer);
 
       // ==========================================
       // 4. Color & Chemistry Logic
@@ -969,29 +980,29 @@
         const eqDesc = document.getElementById('eq-shift-desc');
 
         if (val < 35) {
-          hudDot.className = 'w-3 h-3 rounded-full bg-blue-500 ring-2 ring-white/40';
+          hudDot.className = 'w-3.5 h-3.5 rounded-full bg-blue-500 ring-2 ring-white/40';
           hudLabel.textContent = '염기성 (파란색 계열)';
-          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800';
+          btbBadge.className = 'text-xs sm:text-sm font-semibold px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800';
           btbBadge.textContent = '염기성 · 파란색';
-          eqBox.className = 'mt-3 p-3 rounded-lg bg-blue-950/80 border border-blue-700/60 text-xs sm:text-sm';
+          eqBox.className = 'mt-3.5 p-3.5 rounded-lg bg-blue-950/80 border border-blue-700/60 text-sm sm:text-base';
           eqTitle.className = 'font-bold text-blue-300';
           eqTitle.textContent = '역반응 우세 / 염기성 상태 (H⁺ 농도 낮음)';
           eqDesc.textContent = '용존 CO₂ 농도가 낮아 H⁺ 이온이 적습니다. CO₂가 줄어들면 르샤틀리에 원리에 의해 역반응이 우세해져 파란색 계열을 유지합니다.';
         } else if (val < 68) {
-          hudDot.className = 'w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white/40';
+          hudDot.className = 'w-3.5 h-3.5 rounded-full bg-emerald-500 ring-2 ring-white/40';
           hudLabel.textContent = '중성 부근 (초록색 계열)';
-          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+          btbBadge.className = 'text-xs sm:text-sm font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
           btbBadge.textContent = '중성 · 초록색';
-          eqBox.className = 'mt-3 p-3 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-xs sm:text-sm';
+          eqBox.className = 'mt-3.5 p-3.5 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-sm sm:text-base';
           eqTitle.className = 'font-bold text-emerald-300';
           eqTitle.textContent = '동적 평형 전환 구간 (정반응 진행 중)';
           eqDesc.textContent = 'CO₂가 물에 녹아 탄산(H₂CO₃)을 만들고 H⁺가 늘어나면서 용액이 점차 중성(초록색 계열)으로 변하고 있습니다.';
         } else {
-          hudDot.className = 'w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white/40';
+          hudDot.className = 'w-3.5 h-3.5 rounded-full bg-amber-400 ring-2 ring-white/40';
           hudLabel.textContent = '산성 (노란색 계열)';
-          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+          btbBadge.className = 'text-xs sm:text-sm font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
           btbBadge.textContent = '산성 · 노란색';
-          eqBox.className = 'mt-3 p-3 rounded-lg bg-amber-950/80 border border-amber-700/60 text-xs sm:text-sm';
+          eqBox.className = 'mt-3.5 p-3.5 rounded-lg bg-amber-950/80 border border-amber-700/60 text-sm sm:text-base';
           eqTitle.className = 'font-bold text-amber-300';
           eqTitle.textContent = '정반응 우세 / 산성화 (H⁺ 농도 높음)';
           eqDesc.textContent = 'CO₂ 공급이 많아 르샤틀리에 원리에 따라 정반응(→)이 우세합니다. H⁺ 이온이 크게 늘어 BTB 용액이 노란색 계열로 변합니다.';
@@ -1009,22 +1020,34 @@
         toast.textContent = msg;
         toast.classList.remove('hidden');
         clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => toast.classList.add('hidden'), 2400);
+        toastTimeout = setTimeout(() => toast.classList.add('hidden'), 2600);
       }
 
       function animate() {
         requestAnimationFrame(animate);
         clockTime += 0.016;
 
-        // Rotate magnetic stir bar gently
+        // Smooth camera interpolation when presentation step focuses view
+        if (targetCamera) {
+          state.camera.theta += (targetCamera.theta - state.camera.theta) * 0.08;
+          state.camera.phi += (targetCamera.phi - state.camera.phi) * 0.08;
+          state.camera.radius += (targetCamera.radius - state.camera.radius) * 0.08;
+          updateCameraPosition();
+          if (
+            Math.abs(targetCamera.theta - state.camera.theta) < 0.005 &&
+            Math.abs(targetCamera.phi - state.camera.phi) < 0.005 &&
+            Math.abs(targetCamera.radius - state.camera.radius) < 0.01
+          ) {
+            targetCamera = null;
+          }
+        }
+
         stirBar.rotation.y += 0.065;
 
-        // Subtle liquid surface ripple
         const surfY = -1.51 + liquidHeight + Math.sin(clockTime * 2.5) * 0.005;
         surfaceMesh.position.y = surfY;
         meniscusMesh.position.y = surfY + 0.005;
 
-        // Animate splash ripples
         for (let i = ripples.length - 1; i >= 0; i--) {
           const rp = ripples[i];
           rp.scale += 0.16;
@@ -1036,7 +1059,6 @@
           }
         }
 
-        // Animate Dry Ice Chunks falling & sublimating
         for (let i = dryIceChunks.length - 1; i >= 0; i--) {
           const chunk = dryIceChunks[i];
           if (!chunk.inLiquid) {
@@ -1051,7 +1073,7 @@
             if (chunk.mesh.position.y > -1.3) {
               chunk.mesh.position.y += chunk.vy;
             }
-            chunk.life -= 0.0024;
+            chunk.life -= 0.0022;
             if (state.co2Level < 100) {
               state.co2Level = Math.min(100, state.co2Level + 0.085);
               updateChemistryUI();
@@ -1068,12 +1090,11 @@
           }
         }
 
-        // Animate CO2 Bubbles
         const activeBubbleRatio = Math.min(
           1,
-          (state.co2Level / 100) * 0.8 + (dryIceChunks.length > 0 ? 0.35 : 0.06)
+          (state.co2Level / 100) * 0.8 + (dryIceChunks.length > 0 ? 0.35 : 0.07)
         );
-        const visibleBubbleCount = Math.max(3, Math.floor(bubbles.length * activeBubbleRatio));
+        const visibleBubbleCount = Math.max(4, Math.floor(bubbles.length * activeBubbleRatio));
 
         for (let i = 0; i < bubbles.length; i++) {
           const b = bubbles[i];
@@ -1095,8 +1116,7 @@
           }
         }
 
-        // Animate CO2 Vapor Sprites (rising inside beaker, then spilling over rim & sinking!)
-        const mistIntensity = dryIceChunks.length > 0 ? 0.42 : (state.co2Level > 50 ? 0.16 : 0.0);
+        const mistIntensity = dryIceChunks.length > 0 ? 0.48 : (state.co2Level > 50 ? 0.18 : 0.0);
         for (let i = 0; i < mistParticles.length; i++) {
           const m = mistParticles[i];
           if (mistIntensity <= 0.01) {
@@ -1104,7 +1124,6 @@
             continue;
           }
           if (m.spilling && m.sprite.position.y > 1.38) {
-            // Spill outward over rim & sink down because CO2 is denser than air
             const dist = Math.hypot(m.sprite.position.x, m.sprite.position.z);
             if (dist < 1.65) {
               m.sprite.position.x += Math.cos(m.radialAngle) * 0.015;
@@ -1163,10 +1182,27 @@
       });
 
       document.getElementById('btn-reset-camera').addEventListener('click', () => {
-        state.camera.theta = 0.45;
-        state.camera.phi = 1.15;
-        state.camera.radius = 7.2;
-        updateCameraPosition();
+        focusCamera(0.42, 1.12, 6.35);
+      });
+
+      document.getElementById('btn-expand-view').addEventListener('click', () => {
+        state.expandedView = !state.expandedView;
+        const labSec = document.getElementById('lab-section');
+        const panelSec = document.getElementById('panel-section');
+        const btn = document.getElementById('btn-expand-view');
+        const wrapper = document.getElementById('canvas-wrapper');
+        if (state.expandedView) {
+          labSec.className = 'lg:col-span-12 flex flex-col gap-4';
+          panelSec.className = 'lg:col-span-12 flex flex-col';
+          wrapper.classList.replace('xl:h-[560px]', 'xl:h-[640px]');
+          btn.textContent = '기본 화면으로';
+        } else {
+          labSec.className = 'lg:col-span-6 flex flex-col gap-4';
+          panelSec.className = 'lg:col-span-6 flex flex-col';
+          wrapper.classList.replace('xl:h-[640px]', 'xl:h-[560px]');
+          btn.textContent = '실험 크게 보기';
+        }
+        setTimeout(resizeRenderer, 60);
       });
 
       document.getElementById('btn-reset-all').addEventListener('click', () => {
@@ -1237,23 +1273,23 @@
         document.querySelectorAll('.case-btn').forEach((btn) => {
           const active = btn.dataset.case === caseKey;
           btn.className = active
-            ? 'case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition'
-            : 'case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+            ? 'case-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-blue-600 text-white transition'
+            : 'case-btn px-3.5 py-2 rounded-lg text-xs sm:text-sm font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
         });
 
         const card = document.getElementById('clinical-card');
         card.innerHTML = `
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <h4 class="text-sm sm:text-base font-bold text-slate-900">${c.title}</h4>
-            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${c.badgeColor}">${c.badge}</span>
+            <h4 class="text-base sm:text-lg font-bold text-slate-900">${c.title}</h4>
+            <span class="px-3 py-1 rounded-full text-xs font-bold ${c.badgeColor}">${c.badge}</span>
           </div>
-          <div class="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <div class="space-y-2.5 text-sm sm:text-base text-slate-700 leading-relaxed">
             <p><strong class="text-slate-900">임상 상황:</strong> ${c.situation}</p>
             <p><strong class="text-slate-900">평형·생리 기전:</strong> ${c.equilibrium}</p>
             <p><strong class="text-slate-900">주요 증상 및 대처:</strong> ${c.symptoms}</p>
           </div>
           <button id="btn-apply-case-sim" type="button"
-            class="mt-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+            class="mt-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-semibold transition">
             3D 비커에 이 상태 반영하기 (CO₂ ${c.simCo2}%)
           </button>
         `;
@@ -1314,15 +1350,15 @@
           if (chosen === item.answer) score += 1;
 
           const card = document.createElement('div');
-          card.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2';
+          card.className = 'p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2.5';
 
           const qText = document.createElement('div');
-          qText.className = 'text-xs sm:text-sm font-bold text-slate-900';
+          qText.className = 'text-sm sm:text-base font-bold text-slate-900';
           qText.textContent = item.q;
           card.appendChild(qText);
 
           const optList = document.createElement('div');
-          optList.className = 'space-y-1.5';
+          optList.className = 'space-y-2';
 
           item.options.forEach((optText, oIdx) => {
             const btn = document.createElement('button');
@@ -1335,7 +1371,7 @@
                 style = 'bg-rose-50 border-rose-400 text-rose-900';
               }
             }
-            btn.className = `w-full text-left px-3 py-2 rounded-lg border text-xs transition ${style}`;
+            btn.className = `w-full text-left px-3.5 py-2.5 rounded-lg border text-sm transition ${style}`;
             btn.textContent = optText;
             btn.addEventListener('click', () => {
               state.quizAnswers[idx] = oIdx;
@@ -1348,7 +1384,7 @@
           if (chosen !== undefined) {
             const fb = document.createElement('div');
             const isCorrect = chosen === item.answer;
-            fb.className = `text-xs p-2 rounded-lg ${isCorrect ? 'bg-emerald-100/80 text-emerald-900' : 'bg-rose-100/80 text-rose-900'}`;
+            fb.className = `text-xs sm:text-sm p-2.5 rounded-lg ${isCorrect ? 'bg-emerald-100/80 text-emerald-900' : 'bg-rose-100/80 text-rose-900'}`;
             fb.textContent = (isCorrect ? '정답입니다! ' : '아쉽습니다. ') + item.explain;
             card.appendChild(fb);
           }
@@ -1366,60 +1402,102 @@
       renderQuiz();
 
       // ==========================================
-      // 9. Presentation Mode (발표 모드)
+      // 9. Presentation Mode (8-Step Upgraded Script + Camera Focus)
       // ==========================================
       const presentationSteps = [
         {
-          title: '1단계. 실험 목표 및 초기 상태 (염기성 BTB)',
-          script: '초기 BTB 용액은 CO₂가 적은 염기성 상태(파란색 계열)입니다. 비커를 드래그해 360도로 회전하며 입체 유리 비커와 용액을 살펴봅시다.',
+          title: '1단계. 실험 도입 및 초기 BTB 용액 확인',
+          chip: '염기성 · 파란색',
+          script: '오늘 실험에서는 고체 이산화탄소인 드라이아이스를 BTB 용액에 넣어 기체의 용해와 용액의 산성화를 관찰하고, 이를 인체 혈액의 산-염기 평형까지 연결해 봅니다. 현재 비커 속 BTB 용액은 용존 CO₂가 적은 약염기성 상태이므로 선명한 파란색을 띠고 있습니다.',
+          observe: '비커 정면의 250 mL 눈금과 흰색 세라믹 교반기 위에 비친 파란색 용액, 그리고 프로브 상단의 파란색 LED를 함께 확인해 보세요.',
           action: () => {
             switchTab('equilibrium');
             state.co2Level = 10;
             updateChemistryUI();
+            focusCamera(0.38, 1.12, 6.35);
           }
         },
         {
-          title: '2단계. 드라이아이스 투입과 CO₂ 승화·용해',
-          script: '고체 이산화탄소인 드라이아이스를 비커에 투입합니다. 용액 속으로 가라앉으며 기포가 올라오고 CO₂가 물에 녹기 시작합니다.',
+          title: '2단계. 드라이아이스 투입과 승화 현상',
+          chip: 'CO₂(s) → CO₂(g) 승화',
+          script: '이제 비커에 드라이아이스 조각을 투입합니다. 드라이아이스는 상온·상압에서 액체를 거치지 않고 바로 기체로 승화하며, 물속으로 가라앉는 순간 주변 열을 흡수해 격렬한 이산화탄소 기포와 차가운 수증기 안개를 만들어 냅니다.',
+          observe: '수면의 물결 파문과 함께 바닥으로 가라앉아 회전하며 작아지는 드라이아이스, 그리고 비커 테두리를 넘어 아래로 흘러내리는 무거운 CO₂ 안개를 주목하세요.',
           action: () => {
             switchTab('equilibrium');
             state.iceDroppedCount += 1;
             spawnDryIceChunk();
+            state.co2Level = 38;
+            updateChemistryUI();
+            focusCamera(0.15, 0.96, 4.75);
+            showToast('발표 시연: 드라이아이스 투입 및 승화 관찰');
+          }
+        },
+        {
+          title: '3단계. 기체의 용해와 중성 전환 (초록색)',
+          chip: 'CO₂(aq) + H₂O ⇌ H₂CO₃',
+          script: '발생한 이산화탄소 기체 일부가 물에 녹아 탄산(H₂CO₃)을 형성합니다. 탄산이 이온화되면서 수소 이온(H⁺) 농도가 서서히 높아지고, 용액은 염기성에서 중성 부근인 초록색 계열로 변하기 시작합니다.',
+          observe: '용액 색상이 파란색에서 청록·초록색으로 바뀌는 과정과 오른쪽 화학 평형 패널의 BTB 지시약 마커 이동을 함께 살펴보세요.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 52;
+            updateChemistryUI();
+            focusCamera(-0.42, 1.14, 5.2);
+          }
+        },
+        {
+          title: '4단계. 정반응 우세와 완전 산성화 (노란색)',
+          chip: '정반응(→) 우세 · 산성화',
+          script: 'CO₂ 공급이 계속 늘어나면 르샤틀리에 원리에 따라 증가한 반응물(CO₂)을 소모하는 방향인 정반응이 강하게 우세해집니다. 그 결과 H⁺ 이온이 크게 축적되어 BTB 용액이 완전한 노란색 계열로 변합니다.',
+          observe: '세라믹 판에 비치는 노란빛과 센서 프로브 LED 색상 변화, 그리고 활발하게 올라오는 CO₂ 기포를 확인하세요.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 90;
+            updateChemistryUI();
+            focusCamera(0.55, 1.05, 5.1);
+          }
+        },
+        {
+          title: '5단계. CO₂ 제거와 역반응 이동 확인',
+          chip: '역반응(←) 우세 · 가역 평형',
+          script: '화학 평형은 한쪽 방향으로만 끝나지 않습니다. 반대로 용액 속 CO₂를 외부로 빼내면 르샤틀리에 원리에 의해 줄어든 CO₂를 보충하려는 역반응이 우세해지며, H⁺ 농도가 낮아져 용액이 다시 파란색으로 되돌아옵니다.',
+          observe: '노란색이었던 용액이 CO₂ 감소와 함께 초록색을 거쳐 파란색으로 회복되는 가역적 평형 이동을 확인해 보세요.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 18;
+            updateChemistryUI();
+            focusCamera(0.42, 1.12, 6.35);
+          }
+        },
+        {
+          title: '6단계. 인체 혈액의 탄산-중탄산 완충계',
+          chip: '혈액 pH 항상성 (H₂CO₃/HCO₃⁻)',
+          script: '방금 비커에서 본 반응은 우리 몸속에서도 매 순간 일어납니다. 혈액은 탄산(H₂CO₃)과 중탄산 이온(HCO₃⁻)의 완충 쌍을 이용해 pH 7.35~7.45의 좁은 범위를 유지하며, 폐의 호흡 속도가 바로 CO₂ 배출량을 조절하는 스위치 역할을 합니다.',
+          observe: '오른쪽 패널의 혈액 완충계 설명을 보며, 비커의 CO₂ 조절 슬라이더가 인체의 호흡량과 같다는 점을 연결해 설명합니다.',
+          action: () => {
+            switchTab('equilibrium');
             state.co2Level = 48;
             updateChemistryUI();
-            showToast('발표 시연: 드라이아이스 투입!');
+            focusCamera(0.3, 1.15, 6.1);
           }
         },
         {
-          title: '3단계. 탄산 생성과 산성화 (파랑 → 초록 → 노랑)',
-          script: 'CO₂가 충분히 녹으면 탄산(H₂CO₃)과 수소 이온(H⁺)이 늘어나면서 용액이 초록색을 거쳐 노란색 계열(산성)로 변합니다.',
-          action: () => {
-            switchTab('equilibrium');
-            state.co2Level = 88;
-            updateChemistryUI();
-          }
-        },
-        {
-          title: '4단계. 르샤틀리에 원리와 평형 이동',
-          script: '반대로 CO₂를 제거하면 평형이 역반응 쪽으로 이동해 H⁺가 줄어들고 다시 파란색으로 돌아옵니다. 이것이 화학 평형의 동적 이동입니다.',
-          action: () => {
-            switchTab('equilibrium');
-            state.co2Level = 22;
-            updateChemistryUI();
-          }
-        },
-        {
-          title: '5단계. 인체 호흡과 O₂ · CO₂ · CO 비교',
-          script: '우리 혈액도 탄산-중탄산 완충계로 pH를 조절합니다. 산소(O₂), 이산화탄소(CO₂), 일산화탄소(CO)가 인체에 미치는 차이를 비교해 봅시다.',
+          title: '7단계. 호흡 관련 세 기체 비교 (O₂ · CO₂ · CO)',
+          chip: '생리적 작용 및 독성 비교',
+          script: '호흡에 관여하는 세 기체는 역할이 완전히 다릅니다. 산소(O₂)는 세포 호흡에 필수이고, 이산화탄소(CO₂)는 혈액 pH 균형을 맞추는 핵심 조절자입니다. 반면 일산화탄소(CO)는 헤모글로빈에 산소보다 200배 이상 강하게 결합해 산소 운반 자체를 차단하는 치명적 독성 기체입니다.',
+          observe: '오른쪽 [기체 비교] 탭의 비교표를 통해 세 기체의 헤모글로빈 결합 특성과 이상 시 나타나는 증상을 정리합니다.',
           action: () => {
             switchTab('gases');
+            focusCamera(0.42, 1.12, 6.35);
           }
         },
         {
-          title: '6단계. 임상 사례 적용 및 이해도 퀴즈',
-          script: '과호흡과 저환기 사례를 3D 비커에 직접 반영해 본 뒤, 이해도 퀴즈로 학습 내용을 최종 점검하며 발표를 마무리합니다.',
+          title: '8단계. 임상 사례 시뮬레이션 및 퀴즈 마무리',
+          chip: '과호흡·저환기·퀴즈 점검',
+          script: '마지막으로 과호흡 증후군(호흡성 알칼리증)과 저환기(호흡성 산증) 사례를 3D 비커에 직접 적용해 혈액 상태 변화를 시각적으로 복습한 뒤, 이해도 퀴즈 5문항으로 오늘 탐구 내용을 점검하며 발표를 마칩니다.',
+          observe: '[임상 사례] 탭의 적용 버튼을 눌러 3D 비커 색상 변화를 확인한 후 [이해도 퀴즈] 탭으로 이동해 보세요.',
           action: () => {
             switchTab('clinical');
+            focusCamera(0.42, 1.12, 6.35);
           }
         }
       ];
@@ -1429,7 +1507,9 @@
         const step = presentationSteps[idx];
         document.getElementById('pres-step-badge').textContent = `${idx + 1} / ${presentationSteps.length} 단계`;
         document.getElementById('pres-step-title').textContent = step.title;
+        document.getElementById('pres-concept-chip').textContent = step.chip;
         document.getElementById('pres-step-script').textContent = step.script;
+        document.getElementById('pres-step-observe').textContent = step.observe;
         document.getElementById('btn-pres-prev').disabled = idx === 0;
         document.getElementById('btn-pres-next').disabled = idx === presentationSteps.length - 1;
         step.action();

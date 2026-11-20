@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CO₂ · BTB 3D 가상 실험실 | 화학 평형과 인체 호흡</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap');
+    body {
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    #scene-container canvas {
+      display: block;
+      width: 100% !important;
+      height: 100% !important;
+      touch-action: none;
+      cursor: grab;
+    }
+    #scene-container canvas:active {
+      cursor: grabbing;
+    }
+    .btb-gradient {
+      background: linear-gradient(90deg, #1d4ed8 0%, #2563eb 25%, #10b981 50%, #eab308 75%, #ca8a04 100%);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #0f172a;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: #0f172a;
+      border: 2px solid #ffffff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">
+          CO₂
+        </div>
+        <div>
+          <h1 class="text-base sm:text-lg font-bold text-slate-900 leading-tight">
+            BTB · 드라이아이스 3D 가상 실험실
+          </h1>
+          <p class="text-xs text-slate-500">
+            CO₂ 용해·산성화, 르샤틀리에 원리 및 인체 호흡 평형 탐구
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="btn-presentation-toggle" type="button"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-semibold border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition flex items-center gap-1.5">
+          <span id="pres-dot" class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          <span>발표 모드</span>
+        </button>
+        <button id="btn-reset-all" type="button"
+          class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium border border-slate-200 bg-white text-slate-700 hover:bg-slate-100 transition">
+          실험 초기화
+        </button>
+      </div>
+    </div>
+
+    <!-- Presentation Mode Bar (Hidden by default) -->
+    <div id="presentation-bar" class="hidden bg-indigo-950 text-white border-t border-indigo-800">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <span id="pres-step-badge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-indigo-600 text-white">
+              1 / 6 단계
+            </span>
+            <h2 id="pres-step-title" class="text-sm sm:text-base font-bold truncate">
+              실험 목표 및 초기 상태
+            </h2>
+          </div>
+          <p id="pres-step-script" class="text-xs sm:text-sm text-indigo-100 leading-relaxed">
+            초기 BTB 용액은 약염기성 상태(파란색)입니다. 드라이아이스를 투입했을 때 어떤 변화가 일어날지 예상해 봅시다.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 shrink-0">
+          <button id="btn-pres-prev" type="button"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-800 hover:bg-indigo-700 disabled:opacity-40 transition">
+            ← 이전
+          </button>
+          <button id="btn-pres-next" type="button"
+            class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-500 hover:bg-indigo-400 disabled:opacity-40 transition">
+            다음 →
+          </button>
+          <button id="btn-pres-close" type="button"
+            class="px-2.5 py-1.5 rounded-lg text-xs font-medium text-indigo-200 hover:text-white hover:bg-indigo-800 transition">
+            종료
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-5 grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- Left Column: Three.js 3D Viewport + Controls -->
+    <section class="lg:col-span-6 flex flex-col gap-4">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+        <!-- 3D Canvas Wrapper -->
+        <div class="relative w-full h-[360px] sm:h-[430px] bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+          <div id="scene-container" class="w-full h-full"></div>
+
+          <!-- Top-Left Live Status Overlay -->
+          <div class="absolute top-3 left-3 pointer-events-none flex flex-col gap-1.5">
+            <div class="bg-slate-950/75 backdrop-blur-sm border border-white/10 rounded-xl px-3 py-2 text-white">
+              <div class="flex items-center gap-2">
+                <span id="hud-color-dot" class="w-3 h-3 rounded-full bg-blue-500 ring-2 ring-white/40"></span>
+                <span id="hud-state-label" class="text-xs sm:text-sm font-bold">염기성 (파란색 계열)</span>
+              </div>
+              <div class="mt-1 flex items-center gap-3 text-[11px] text-slate-300">
+                <span>개념적 CO₂ 공급: <strong id="hud-co2-val" class="text-white">10%</strong></span>
+                <span>투입된 드라이아이스: <strong id="hud-ice-count" class="text-cyan-300">0개</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top-Right Camera Controls -->
+          <div class="absolute top-3 right-3 flex flex-col items-end gap-1.5">
+            <button id="btn-reset-camera" type="button"
+              class="px-2.5 py-1.5 rounded-lg bg-slate-950/75 hover:bg-slate-900 text-white text-[11px] font-medium border border-white/15 backdrop-blur-sm transition">
+              시점 초기화
+            </button>
+            <span class="px-2 py-0.5 rounded-md bg-slate-950/60 text-[10px] text-slate-300 pointer-events-none">
+              드래그 360° 회전 · 스크롤 확대
+            </span>
+          </div>
+
+          <!-- Bottom-Center Toast for Dry Ice Drop -->
+          <div id="scene-toast"
+            class="hidden absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-cyan-500/90 text-slate-950 text-xs font-bold shadow-lg pointer-events-none whitespace-nowrap">
+            드라이아이스 투입! CO₂ 기포 발생 및 용해 중
+          </div>
+        </div>
+
+        <!-- Experiment Controls -->
+        <div class="p-4 sm:p-5 bg-white border-t border-slate-100 flex flex-col gap-4">
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="co2-slider" class="text-sm font-semibold text-slate-800">
+                CO₂ 공급량 조절 (개념적 수준)
+              </label>
+              <span id="slider-val-badge" class="text-xs font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-700">
+                10 / 100
+              </span>
+            </div>
+            <input id="co2-slider" type="range" min="0" max="100" value="10"
+              class="w-full h-2.5 rounded-lg appearance-none cursor-pointer btb-gradient" />
+            <div class="flex justify-between text-[11px] text-slate-500 mt-1">
+              <span>낮음 (파란색 · 염기성)</span>
+              <span>중간 (초록색 · 중성)</span>
+              <span>높음 (노란색 · 산성)</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <button id="btn-drop-ice" type="button"
+              class="px-3 py-2.5 rounded-xl bg-cyan-600 hover:bg-cyan-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition flex items-center justify-center gap-1.5">
+              <span>🧊</span>
+              <span>드라이아이스 투입</span>
+            </button>
+            <button id="btn-add-co2" type="button"
+              class="px-3 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              + CO₂ 추가 (+15)
+            </button>
+            <button id="btn-remove-co2" type="button"
+              class="px-3 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold shadow-sm transition">
+              - CO₂ 제거 (-15)
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Tabbed Learning Panel -->
+    <section class="lg:col-span-6 flex flex-col">
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm flex-1 flex flex-col overflow-hidden">
+        <!-- Tab Headers -->
+        <nav class="flex border-b border-slate-200 bg-slate-50/70 overflow-x-auto" aria-label="학습 메뉴">
+          <button data-tab="equilibrium" type="button"
+            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-blue-600 text-blue-700 bg-white transition whitespace-nowrap">
+            화학 평형
+          </button>
+          <button data-tab="gases" type="button"
+            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            기체 비교
+          </button>
+          <button data-tab="clinical" type="button"
+            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            임상 사례
+          </button>
+          <button data-tab="quiz" type="button"
+            class="tab-btn flex-1 min-w-[100px] px-3 py-3 text-xs sm:text-sm font-semibold border-b-2 border-transparent text-slate-600 hover:text-slate-900 transition whitespace-nowrap">
+            이해도 퀴즈
+          </button>
+        </nav>
+
+        <!-- Tab Panels -->
+        <div class="p-4 sm:p-5 flex-1 overflow-y-auto">
+
+          <!-- Tab 1: 화학 평형 & 르샤틀리에 원리 -->
+          <div id="tab-equilibrium" class="tab-panel space-y-4">
+            <div class="rounded-xl bg-slate-900 text-white p-4">
+              <div class="text-[11px] uppercase tracking-wider text-slate-400 font-semibold mb-2">
+                실시간 화학 반응식 및 평형 이동
+              </div>
+              <div class="space-y-1.5 text-xs sm:text-sm font-mono bg-slate-800/80 rounded-lg p-3 border border-slate-700">
+                <div>1) CO₂(s, 드라이아이스) → CO₂(g) ⇌ CO₂(aq)</div>
+                <div>2) CO₂(aq) + H₂O(l) ⇌ H₂CO₃(aq) ⇌ H⁺(aq) + HCO₃⁻(aq)</div>
+              </div>
+              <div id="eq-shift-box" class="mt-3 p-3 rounded-lg bg-blue-950/80 border border-blue-700/60 text-xs sm:text-sm">
+                <div class="font-bold text-blue-300" id="eq-shift-title">
+                  초기 평형 상태 (H⁺ 농도 낮음)
+                </div>
+                <p id="eq-shift-desc" class="text-slate-200 mt-1 leading-relaxed">
+                  용액 속 용존 CO₂가 적어 H⁺ 이온 농도가 낮습니다. BTB 지시약은 염기성 영역인 파란색 계열을 띱니다.
+                </p>
+              </div>
+            </div>
+
+            <!-- BTB Color Scale -->
+            <div class="rounded-xl border border-slate-200 p-4">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-slate-800">BTB 지시약 색상 변화</h3>
+                <span id="btb-badge" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">
+                  염기성 · 파란색
+                </span>
+              </div>
+              <div class="relative h-4 rounded-full btb-gradient overflow-visible my-3">
+                <div id="btb-marker"
+                  class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-2 border-slate-900 shadow-md transition-all duration-150"
+                  style="left: 10%;"></div>
+              </div>
+              <div class="grid grid-cols-3 text-center text-xs gap-2 pt-1">
+                <div class="p-2 rounded-lg bg-blue-50 text-blue-800">
+                  <div class="font-bold">파란색 계열</div>
+                  <div class="text-[11px]">CO₂ 적음 (염기성)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-emerald-50 text-emerald-800">
+                  <div class="font-bold">초록색 계열</div>
+                  <div class="text-[11px]">중간 평형 (중성)</div>
+                </div>
+                <div class="p-2 rounded-lg bg-amber-50 text-amber-800">
+                  <div class="font-bold">노란색 계열</div>
+                  <div class="text-[11px]">CO₂ 많음 (산성)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Human Blood Buffer Connection -->
+            <div class="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4">
+              <h3 class="text-sm font-bold text-indigo-950 mb-1.5">
+                인체 호흡과 혈액의 산-염기 평형 연결
+              </h3>
+              <p class="text-xs sm:text-sm text-indigo-900 leading-relaxed">
+                우리 혈액도 동일한 탄산-중탄산 완충계(<strong>H₂CO₃ / HCO₃⁻</strong>)로 pH를 조절합니다.
+                호흡이 느려져 체내 CO₂가 쌓이면(정반응 우세) H⁺가 증가해 혈액이 산성화(<strong>호흡성 산증</strong>)되고,
+                과호흡으로 CO₂를 과도하게 내보내면(역반응 우세) H⁺가 감소해 알칼리화(<strong>호흡성 알칼리증</strong>)됩니다.
+              </p>
+            </div>
+          </div>
+
+          <!-- Tab 2: O2, CO2, CO 비교 -->
+          <div id="tab-gases" class="tab-panel hidden space-y-4">
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              호흡과 밀접한 세 기체(O₂, CO₂, CO)는 혈액 내 운반 방식과 인체에 미치는 영향이 뚜렷하게 다릅니다.
+            </p>
+
+            <div class="overflow-x-auto rounded-xl border border-slate-200">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                    <th class="p-3 font-bold">기체</th>
+                    <th class="p-3 font-bold">혈액 운반·작용</th>
+                    <th class="p-3 font-bold">이상 시 인체 영향</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                  <tr class="bg-white">
+                    <td class="p-3 font-bold text-sky-700 whitespace-nowrap">O₂ (산소)</td>
+                    <td class="p-3 text-slate-700">적혈구 헤모글로빈(Hb)과 가역적으로 결합하여 조직 세포로 운반, 세포 호흡에 필수.</td>
+                    <td class="p-3 text-slate-700">부족 시 저산소증(어지럼증, 청색증, 의식 저하) 발생.</td>
+                  </tr>
+                  <tr class="bg-slate-50/60">
+                    <td class="p-3 font-bold text-amber-700 whitespace-nowrap">CO₂ (이산화탄소)</td>
+                    <td class="p-3 text-slate-700">대부분 혈장에서 중탄산 이온(HCO₃⁻) 형태로 운반되며 혈액 pH 평형 및 호흡 중추 자극에 관여.</td>
+                    <td class="p-3 text-slate-700">과다 축적 시 호흡성 산증(두통, 혼란), 과도 배출 시 호흡성 알칼리증(손발 저림).</td>
+                  </tr>
+                  <tr class="bg-white">
+                    <td class="p-3 font-bold text-rose-700 whitespace-nowrap">CO (일산화탄소)</td>
+                    <td class="p-3 text-slate-700">헤모글로빈과의 결합력이 산소보다 매우 높아(약 200배 이상) 산소 결합 자리를 차지함.</td>
+                    <td class="p-3 text-slate-700">혈액 내 산소 운반이 차단되어 조직 저산소증, 두통, 구토, 심각 시 생명 위험.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-3 rounded-xl border border-sky-200 bg-sky-50/70">
+                <div class="text-xs font-bold text-sky-900">O₂ 핵심 포인트</div>
+                <p class="text-xs text-sky-800 mt-1">산소 공급이 원활해야 세포 에너지(ATP) 생성이 정상 유지됩니다.</p>
+              </div>
+              <div class="p-3 rounded-xl border border-amber-200 bg-amber-50/70">
+                <div class="text-xs font-bold text-amber-900">CO₂ 핵심 포인트</div>
+                <p class="text-xs text-amber-800 mt-1">단순 노폐물이 아니라 혈액 산-염기 평형 조절의 핵심 물질입니다.</p>
+              </div>
+              <div class="p-3 rounded-xl border border-rose-200 bg-rose-50/70">
+                <div class="text-xs font-bold text-rose-900">CO 핵심 포인트</div>
+                <p class="text-xs text-rose-800 mt-1">무색·무취로 감지가 어렵고 Hb 결합을 방해하므로 환기가 필수입니다.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 3: 호흡 관련 임상 사례 -->
+          <div id="tab-clinical" class="tab-panel hidden space-y-4">
+            <div class="flex flex-wrap gap-2">
+              <button data-case="hyper" type="button"
+                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition">
+                사례 1. 과호흡 증후군
+              </button>
+              <button data-case="hypo" type="button"
+                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                사례 2. 저환기 (COPD 등)
+              </button>
+              <button data-case="co" type="button"
+                class="case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition">
+                사례 3. 일산화탄소 중독
+              </button>
+            </div>
+
+            <div id="clinical-card" class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 space-y-3">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+
+          <!-- Tab 4: 이해도 퀴즈 -->
+          <div id="tab-quiz" class="tab-panel hidden space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-bold text-slate-800">이해도 확인 퀴즈</h3>
+              <span id="quiz-score-badge" class="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
+                점수: 0 / 5
+              </span>
+            </div>
+            <div id="quiz-container" class="space-y-4">
+              <!-- Populated by JS -->
+            </div>
+            <button id="btn-quiz-reset" type="button"
+              class="px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-xs font-semibold text-slate-700 transition">
+              퀴즈 다시 풀기
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer Disclaimer -->
+  <footer class="bg-white border-t border-slate-200 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <span>
+        ※ 현재 가상 실험실은 교육용 개념 시뮬레이션입니다. 슬라이더 값은 실제 CO₂ 농도나 pH 측정값이 아니며, 실제 실험 결과를 정량적으로 재현하지는 않습니다.
+      </span>
+      <span class="text-slate-400 shrink-0">Three.js 3D Interactive Lab</span>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      // ==========================================
+      // 1. State Management
+      // ==========================================
+      const state = {
+        co2Level: 10, // 0 ~ 100
+        activeTab: 'equilibrium',
+        activeCase: 'hyper',
+        presentationMode: false,
+        presentationStep: 0,
+        iceDroppedCount: 0,
+        quizAnswers: {},
+        camera: {
+          theta: 0.45,
+          phi: 1.15,
+          radius: 7.2,
+          isDragging: false,
+          lastX: 0,
+          lastY: 0
+        }
+      };
+
+      // ==========================================
+      // 2. Three.js 3D Scene Setup (High-Realism Lab)
+      // ==========================================
+      const container = document.getElementById('scene-container');
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x0f172a, 0.042);
+
+      const camera = new THREE.PerspectiveCamera(
+        40,
+        container.clientWidth / Math.max(container.clientHeight, 1),
+        0.1,
+        100
+      );
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.12;
+      container.appendChild(renderer.domElement);
+
+      // Studio Laboratory Lighting
+      const hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x1e293b, 0.78);
+      scene.add(hemiLight);
+
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+      keyLight.position.set(4.5, 8.5, 5.5);
+      keyLight.castShadow = true;
+      keyLight.shadow.mapSize.width = 1024;
+      keyLight.shadow.mapSize.height = 1024;
+      keyLight.shadow.camera.near = 1;
+      keyLight.shadow.camera.far = 22;
+      scene.add(keyLight);
+
+      const rimLight = new THREE.DirectionalLight(0x7dd3fc, 0.75);
+      rimLight.position.set(-5.5, 4.5, -4.5);
+      scene.add(rimLight);
+
+      const fillLight = new THREE.DirectionalLight(0xf8fafc, 0.45);
+      fillLight.position.set(-3, 2, 5);
+      scene.add(fillLight);
+
+      // Caustic / Solution Glow Light on the Ceramic Plate
+      const causticLight = new THREE.PointLight(0x2563eb, 0.9, 5.5);
+      causticLight.position.set(0, -1.0, 0.2);
+      scene.add(causticLight);
+
+      // Procedural Textures: 1) Beaker Graduation Markings, 2) Soft Vapor Fog Sprite
+      function createBeakerLabelTexture() {
+        const c = document.createElement('canvas');
+        c.width = 1024;
+        c.height = 512;
+        const ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.78)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.lineWidth = 3;
+        ctx.font = 'bold 22px Inter, sans-serif';
+
+        // Place markings on front-facing arc of cylinder
+        const centerX = 512;
+        const marks = [
+          { y: 400, label: '50' },
+          { y: 330, label: '100' },
+          { y: 260, label: '150' },
+          { y: 190, label: '200' },
+          { y: 120, label: '250 mL' }
+        ];
+        marks.forEach((m) => {
+          ctx.beginPath();
+          ctx.moveTo(centerX - 38, m.y);
+          ctx.lineTo(centerX + 18, m.y);
+          ctx.stroke();
+          ctx.fillText(m.label, centerX + 26, m.y + 7);
+        });
+
+        // Minor ticks
+        ctx.lineWidth = 2;
+        for (let y = 155; y <= 400; y += 35) {
+          ctx.beginPath();
+          ctx.moveTo(centerX - 24, y);
+          ctx.lineTo(centerX + 4, y);
+          ctx.stroke();
+        }
+
+        ctx.font = '600 18px Inter, sans-serif';
+        ctx.fillStyle = 'rgba(226, 232, 240, 0.72)';
+        ctx.fillText('BOROSILICATE 3.3', centerX - 75, 455);
+
+        const tex = new THREE.CanvasTexture(c);
+        tex.anisotropy = 4;
+        return tex;
+      }
+
+      function createFogTexture() {
+        const c = document.createElement('canvas');
+        c.width = 128;
+        c.height = 128;
+        const ctx = c.getContext('2d');
+        const grad = ctx.createRadialGradient(64, 64, 6, 64, 64, 62);
+        grad.addColorStop(0, 'rgba(241, 245, 249, 0.85)');
+        grad.addColorStop(0.45, 'rgba(226, 232, 240, 0.35)');
+        grad.addColorStop(1, 'rgba(226, 232, 240, 0.0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 128, 128);
+        return new THREE.CanvasTexture(c);
+      }
+
+      const fogTexture = createFogTexture();
+
+      // Laboratory Benchtop
+      const benchGeo = new THREE.CylinderGeometry(7.5, 7.5, 0.3, 64);
+      const benchMat = new THREE.MeshStandardMaterial({
+        color: 0x0f172a,
+        roughness: 0.72,
+        metalness: 0.15
+      });
+      const benchMesh = new THREE.Mesh(benchGeo, benchMat);
+      benchMesh.position.y = -2.18;
+      benchMesh.receiveShadow = true;
+      scene.add(benchMesh);
+
+      // Magnetic Stirrer Base (Realistic Lab Equipment)
+      const stirrerGroup = new THREE.Group();
+      scene.add(stirrerGroup);
+
+      const stirrerBodyGeo = new THREE.CylinderGeometry(1.75, 1.88, 0.34, 48);
+      const stirrerBodyMat = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        roughness: 0.38,
+        metalness: 0.55
+      });
+      const stirrerBody = new THREE.Mesh(stirrerBodyGeo, stirrerBodyMat);
+      stirrerBody.position.y = -1.86;
+      stirrerBody.receiveShadow = true;
+      stirrerBody.castShadow = true;
+      stirrerGroup.add(stirrerBody);
+
+      // White Ceramic Top Plate (reflects BTB solution color!)
+      const plateGeo = new THREE.CylinderGeometry(1.52, 1.54, 0.07, 48);
+      const plateMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.22,
+        metalness: 0.05
+      });
+      const plateMesh = new THREE.Mesh(plateGeo, plateMat);
+      plateMesh.position.y = -1.66;
+      plateMesh.receiveShadow = true;
+      stirrerGroup.add(plateMesh);
+
+      // Power indicator LED on Stirrer Front
+      const ledGeo = new THREE.SphereGeometry(0.045, 12, 12);
+      const ledMat = new THREE.MeshBasicMaterial({ color: 0x22d3ee });
+      const ledMesh = new THREE.Mesh(ledGeo, ledMat);
+      ledMesh.position.set(0.45, -1.84, 1.78);
+      stirrerGroup.add(ledMesh);
+
+      // Retort Stand & Digital pH/CO2 Sensor Probe
+      const standGroup = new THREE.Group();
+      scene.add(standGroup);
+
+      const metalMat = new THREE.MeshStandardMaterial({
+        color: 0x94a3b8,
+        roughness: 0.28,
+        metalness: 0.85
+      });
+
+      const rodGeo = new THREE.CylinderGeometry(0.055, 0.055, 4.6, 20);
+      const rodMesh = new THREE.Mesh(rodGeo, metalMat);
+      rodMesh.position.set(-1.95, 0.25, -0.85);
+      rodMesh.castShadow = true;
+      standGroup.add(rodMesh);
+
+      const clampArmGeo = new THREE.CylinderGeometry(0.032, 0.032, 1.55, 16);
+      const clampArm = new THREE.Mesh(clampArmGeo, metalMat);
+      clampArm.rotation.z = Math.PI / 2 - 0.12;
+      clampArm.rotation.y = -0.45;
+      clampArm.position.set(-1.28, 1.95, -0.48);
+      standGroup.add(clampArm);
+
+      // Sensor Probe Body dipping into BTB solution
+      const probeBodyGeo = new THREE.CylinderGeometry(0.065, 0.055, 2.35, 20);
+      const probeBodyMat = new THREE.MeshStandardMaterial({
+        color: 0x1e293b,
+        roughness: 0.35,
+        metalness: 0.45
+      });
+      const probeMesh = new THREE.Mesh(probeBodyGeo, probeBodyMat);
+      probeMesh.position.set(-0.72, 0.88, -0.18);
+      probeMesh.rotation.z = -0.06;
+      standGroup.add(probeMesh);
+
+      const probeTipGeo = new THREE.SphereGeometry(0.058, 16, 16);
+      const probeTipMat = new THREE.MeshPhysicalMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.85,
+        roughness: 0.1,
+        clearcoat: 1.0
+      });
+      const probeTip = new THREE.Mesh(probeTipGeo, probeTipMat);
+      probeTip.position.set(-0.79, -0.29, -0.18);
+      standGroup.add(probeTip);
+
+      // Probe Top Status LED
+      const probeLedGeo = new THREE.CylinderGeometry(0.072, 0.072, 0.08, 20);
+      const probeLedMat = new THREE.MeshBasicMaterial({ color: 0x3b82f6 });
+      const probeLed = new THREE.Mesh(probeLedGeo, probeLedMat);
+      probeLed.position.set(-0.65, 2.04, -0.18);
+      probeLed.rotation.z = -0.06;
+      standGroup.add(probeLed);
+
+      // Beaker Group
+      const beakerGroup = new THREE.Group();
+      scene.add(beakerGroup);
+
+      const beakerRadius = 1.32;
+      const beakerHeight = 3.05;
+
+      // Studio Glass Material
+      const glassMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.24,
+        roughness: 0.05,
+        metalness: 0.05,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.04,
+        reflectivity: 0.95,
+        side: THREE.DoubleSide,
+        depthWrite: false
+      });
+
+      const wallGeo = new THREE.CylinderGeometry(beakerRadius, beakerRadius * 0.96, beakerHeight, 64, 1, true);
+      const wallMesh = new THREE.Mesh(wallGeo, glassMat);
+      wallMesh.position.y = -0.08;
+      beakerGroup.add(wallMesh);
+
+      // Printed Graduation Overlay Cylinder
+      const labelGeo = new THREE.CylinderGeometry(beakerRadius + 0.004, beakerRadius * 0.96 + 0.004, beakerHeight * 0.92, 64, 1, true);
+      const labelMat = new THREE.MeshBasicMaterial({
+        map: createBeakerLabelTexture(),
+        transparent: true,
+        opacity: 0.85,
+        depthWrite: false,
+        side: THREE.DoubleSide
+      });
+      const labelMesh = new THREE.Mesh(labelGeo, labelMat);
+      labelMesh.position.y = -0.12;
+      labelMesh.rotation.y = -Math.PI / 2;
+      beakerGroup.add(labelMesh);
+
+      // Thick Glass Base Puck
+      const bottomGlassGeo = new THREE.CylinderGeometry(beakerRadius * 0.96, beakerRadius * 0.96, 0.1, 64);
+      const bottomGlassMesh = new THREE.Mesh(bottomGlassGeo, new THREE.MeshPhysicalMaterial({
+        color: 0xbae6fd,
+        transparent: true,
+        opacity: 0.42,
+        roughness: 0.08,
+        clearcoat: 1.0
+      }));
+      bottomGlassMesh.position.y = -1.56;
+      beakerGroup.add(bottomGlassMesh);
+
+      // Beaker Top Rim (3D Torus)
+      const rimGeo = new THREE.TorusGeometry(beakerRadius, 0.058, 18, 64);
+      const rimMat = new THREE.MeshPhysicalMaterial({
+        color: 0xe0f2fe,
+        transparent: true,
+        opacity: 0.68,
+        roughness: 0.05,
+        clearcoat: 1.0
+      });
+      const rimMesh = new THREE.Mesh(rimGeo, rimMat);
+      rimMesh.rotation.x = Math.PI / 2;
+      rimMesh.position.y = 1.44;
+      beakerGroup.add(rimMesh);
+
+      // PTFE Magnetic Stir Bar inside Beaker
+      const stirBarGeo = new THREE.CylinderGeometry(0.055, 0.055, 0.42, 16);
+      const stirBarMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.25,
+        metalness: 0.05
+      });
+      const stirBar = new THREE.Mesh(stirBarGeo, stirBarMat);
+      stirBar.rotation.z = Math.PI / 2;
+      stirBar.position.y = -1.44;
+      beakerGroup.add(stirBar);
+
+      // BTB Solution Liquid inside Beaker
+      const liquidHeight = 1.98;
+      const liquidRadius = beakerRadius * 0.915;
+      const liquidGeo = new THREE.CylinderGeometry(liquidRadius, liquidRadius * 0.965, liquidHeight, 64);
+      const liquidMat = new THREE.MeshPhysicalMaterial({
+        color: 0x2563eb,
+        transparent: true,
+        opacity: 0.74,
+        roughness: 0.08,
+        metalness: 0.02,
+        clearcoat: 0.85,
+        clearcoatRoughness: 0.08
+      });
+      const liquidMesh = new THREE.Mesh(liquidGeo, liquidMat);
+      liquidMesh.position.y = -1.51 + liquidHeight / 2;
+      beakerGroup.add(liquidMesh);
+
+      // Liquid Top Surface + Meniscus Ring
+      const surfaceGeo = new THREE.CircleGeometry(liquidRadius, 64);
+      const surfaceMat = new THREE.MeshPhysicalMaterial({
+        color: 0x3b82f6,
+        transparent: true,
+        opacity: 0.86,
+        roughness: 0.06,
+        clearcoat: 1.0,
+        side: THREE.DoubleSide
+      });
+      const surfaceMesh = new THREE.Mesh(surfaceGeo, surfaceMat);
+      surfaceMesh.rotation.x = -Math.PI / 2;
+      surfaceMesh.position.y = -1.51 + liquidHeight + 0.005;
+      beakerGroup.add(surfaceMesh);
+
+      const meniscusGeo = new THREE.TorusGeometry(liquidRadius - 0.01, 0.022, 12, 64);
+      const meniscusMat = new THREE.MeshBasicMaterial({
+        color: 0x93c5fd,
+        transparent: true,
+        opacity: 0.55
+      });
+      const meniscusMesh = new THREE.Mesh(meniscusGeo, meniscusMat);
+      meniscusMesh.rotation.x = Math.PI / 2;
+      meniscusMesh.position.y = -1.51 + liquidHeight + 0.01;
+      beakerGroup.add(meniscusMesh);
+
+      // Splash Ripple Rings when Dry Ice hits liquid
+      const ripples = [];
+      function spawnRipple() {
+        const rGeo = new THREE.RingGeometry(0.08, 0.14, 32);
+        const rMat = new THREE.MeshBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.85,
+          side: THREE.DoubleSide
+        });
+        const rMesh = new THREE.Mesh(rGeo, rMat);
+        rMesh.rotation.x = -Math.PI / 2;
+        rMesh.position.y = -1.51 + liquidHeight + 0.018;
+        beakerGroup.add(rMesh);
+        ripples.push({ mesh: rMesh, mat: rMat, scale: 1.0 });
+      }
+
+      // Dry Ice Chunks Array (Crystalline falling & sublimating)
+      const dryIceChunks = [];
+      const iceMat = new THREE.MeshStandardMaterial({
+        color: 0xf8fafc,
+        roughness: 0.58,
+        metalness: 0.04,
+        emissive: 0xbae6fd,
+        emissiveIntensity: 0.28
+      });
+
+      function spawnDryIceChunk() {
+        const chunkGroup = new THREE.Group();
+        const mainGeo = new THREE.DodecahedronGeometry(0.2 + Math.random() * 0.06, 0);
+        const mainMesh = new THREE.Mesh(mainGeo, iceMat);
+        chunkGroup.add(mainMesh);
+
+        // Add smaller crystalline facet for realistic irregular dry ice look
+        const subGeo = new THREE.IcosahedronGeometry(0.12, 0);
+        const subMesh = new THREE.Mesh(subGeo, iceMat);
+        subMesh.position.set(0.11, 0.06, -0.05);
+        chunkGroup.add(subMesh);
+
+        chunkGroup.position.set(
+          (Math.random() - 0.5) * 0.65,
+          2.65,
+          (Math.random() - 0.5) * 0.65
+        );
+        chunkGroup.rotation.set(Math.random() * 3, Math.random() * 3, Math.random() * 3);
+        beakerGroup.add(chunkGroup);
+
+        dryIceChunks.push({
+          mesh: chunkGroup,
+          vy: -0.025,
+          inLiquid: false,
+          life: 1.0,
+          rotSpeed: { x: 0.018 + Math.random() * 0.02, y: 0.025 }
+        });
+      }
+
+      // CO2 Bubbles inside Liquid (more detailed & buoyant)
+      const bubbles = [];
+      const bubbleGeo = new THREE.SphereGeometry(0.042, 14, 14);
+      const bubbleMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.78,
+        roughness: 0.05,
+        clearcoat: 1.0
+      });
+
+      for (let i = 0; i < 60; i++) {
+        const bMesh = new THREE.Mesh(bubbleGeo, bubbleMat);
+        resetBubble(bMesh, true);
+        beakerGroup.add(bMesh);
+        bubbles.push({
+          mesh: bMesh,
+          speed: 0.013 + Math.random() * 0.022,
+          wobbleOffset: Math.random() * Math.PI * 2,
+          baseScale: 0.45 + Math.random() * 0.9
+        });
+      }
+
+      function resetBubble(mesh, randomY) {
+        if (!randomY && dryIceChunks.length > 0 && Math.random() < 0.72) {
+          const target = dryIceChunks[Math.floor(Math.random() * dryIceChunks.length)];
+          mesh.position.x = target.mesh.position.x + (Math.random() - 0.5) * 0.25;
+          mesh.position.z = target.mesh.position.z + (Math.random() - 0.5) * 0.25;
+          mesh.position.y = Math.max(-1.42, target.mesh.position.y);
+          return;
+        }
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * (liquidRadius - 0.14);
+        mesh.position.x = Math.cos(angle) * r;
+        mesh.position.z = Math.sin(angle) * r;
+        mesh.position.y = randomY
+          ? -1.42 + Math.random() * (liquidHeight - 0.15)
+          : -1.42 + Math.random() * 0.22;
+      }
+
+      // Volumetric-looking CO2 Vapor Sprites (spilling over rim & sinking!)
+      const mistParticles = [];
+      for (let i = 0; i < 28; i++) {
+        const sMat = new THREE.SpriteMaterial({
+          map: fogTexture,
+          color: 0xf1f5f9,
+          transparent: true,
+          opacity: 0.0,
+          depthWrite: false
+        });
+        const sprite = new THREE.Sprite(sMat);
+        resetMist(sprite, true);
+        beakerGroup.add(sprite);
+        mistParticles.push({
+          sprite,
+          mat: sMat,
+          phase: Math.random() * Math.PI * 2,
+          speed: 0.008 + Math.random() * 0.008,
+          radialAngle: Math.random() * Math.PI * 2,
+          spilling: i % 2 === 0
+        });
+      }
+
+      function resetMist(sprite, randomProgress) {
+        const angle = Math.random() * Math.PI * 2;
+        const r = Math.random() * (liquidRadius * 0.7);
+        sprite.position.set(
+          Math.cos(angle) * r,
+          randomProgress ? 0.55 + Math.random() * 0.9 : 0.5,
+          Math.sin(angle) * r
+        );
+        const s = 0.55 + Math.random() * 0.55;
+        sprite.scale.set(s, s, 1);
+      }
+
+      // ==========================================
+      // 3. 360-Degree Camera Orbit & Zoom
+      // ==========================================
+      function updateCameraPosition() {
+        const { theta, phi, radius } = state.camera;
+        camera.position.x = radius * Math.sin(phi) * Math.sin(theta);
+        camera.position.y = radius * Math.cos(phi);
+        camera.position.z = radius * Math.sin(phi) * Math.cos(theta);
+        camera.lookAt(0, -0.15, 0);
+      }
+      updateCameraPosition();
+
+      const dom = renderer.domElement;
+      dom.addEventListener('pointerdown', (e) => {
+        state.camera.isDragging = true;
+        state.camera.lastX = e.clientX;
+        state.camera.lastY = e.clientY;
+        dom.setPointerCapture(e.pointerId);
+      });
+
+      dom.addEventListener('pointermove', (e) => {
+        if (!state.camera.isDragging) return;
+        const dx = e.clientX - state.camera.lastX;
+        const dy = e.clientY - state.camera.lastY;
+        state.camera.lastX = e.clientX;
+        state.camera.lastY = e.clientY;
+
+        state.camera.theta -= dx * 0.01;
+        state.camera.phi = Math.max(0.32, Math.min(Math.PI / 2 - 0.04, state.camera.phi - dy * 0.008));
+        updateCameraPosition();
+      });
+
+      dom.addEventListener('pointerup', (e) => {
+        state.camera.isDragging = false;
+        try { dom.releasePointerCapture(e.pointerId); } catch (_) {}
+      });
+
+      dom.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        state.camera.radius = Math.max(4.4, Math.min(11.0, state.camera.radius + e.deltaY * 0.005));
+        updateCameraPosition();
+      }, { passive: false });
+
+      window.addEventListener('resize', () => {
+        const w = container.clientWidth;
+        const h = Math.max(container.clientHeight, 1);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+        renderer.setSize(w, h);
+      });
+
+      // ==========================================
+      // 4. Color & Chemistry Logic
+      // ==========================================
+      const colorBlue = new THREE.Color(0x2563eb);
+      const colorGreen = new THREE.Color(0x10b981);
+      const colorYellow = new THREE.Color(0xeab308);
+      const currentLiquidColor = new THREE.Color();
+
+      function computeBTBColor(level) {
+        const t = Math.max(0, Math.min(100, level)) / 100;
+        if (t <= 0.5) {
+          currentLiquidColor.copy(colorBlue).lerp(colorGreen, t * 2);
+        } else {
+          currentLiquidColor.copy(colorGreen).lerp(colorYellow, (t - 0.5) * 2);
+        }
+        return currentLiquidColor;
+      }
+
+      function updateChemistryUI() {
+        const val = Math.round(state.co2Level);
+        const col = computeBTBColor(val);
+        liquidMat.color.copy(col);
+        surfaceMat.color.copy(col).offsetHSL(0, 0, 0.08);
+        meniscusMat.color.copy(col).offsetHSL(0, 0, 0.22);
+        causticLight.color.copy(col);
+        probeLedMat.color.copy(col);
+
+        document.getElementById('co2-slider').value = val;
+        document.getElementById('slider-val-badge').textContent = `${val} / 100`;
+        document.getElementById('hud-co2-val').textContent = `${val}%`;
+        document.getElementById('hud-ice-count').textContent = `${state.iceDroppedCount}개`;
+        document.getElementById('btb-marker').style.left = `${val}%`;
+
+        const hudDot = document.getElementById('hud-color-dot');
+        const hudLabel = document.getElementById('hud-state-label');
+        const btbBadge = document.getElementById('btb-badge');
+        const eqBox = document.getElementById('eq-shift-box');
+        const eqTitle = document.getElementById('eq-shift-title');
+        const eqDesc = document.getElementById('eq-shift-desc');
+
+        if (val < 35) {
+          hudDot.className = 'w-3 h-3 rounded-full bg-blue-500 ring-2 ring-white/40';
+          hudLabel.textContent = '염기성 (파란색 계열)';
+          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800';
+          btbBadge.textContent = '염기성 · 파란색';
+          eqBox.className = 'mt-3 p-3 rounded-lg bg-blue-950/80 border border-blue-700/60 text-xs sm:text-sm';
+          eqTitle.className = 'font-bold text-blue-300';
+          eqTitle.textContent = '역반응 우세 / 염기성 상태 (H⁺ 농도 낮음)';
+          eqDesc.textContent = '용존 CO₂ 농도가 낮아 H⁺ 이온이 적습니다. CO₂가 줄어들면 르샤틀리에 원리에 의해 역반응이 우세해져 파란색 계열을 유지합니다.';
+        } else if (val < 68) {
+          hudDot.className = 'w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-white/40';
+          hudLabel.textContent = '중성 부근 (초록색 계열)';
+          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+          btbBadge.textContent = '중성 · 초록색';
+          eqBox.className = 'mt-3 p-3 rounded-lg bg-emerald-950/80 border border-emerald-700/60 text-xs sm:text-sm';
+          eqTitle.className = 'font-bold text-emerald-300';
+          eqTitle.textContent = '동적 평형 전환 구간 (정반응 진행 중)';
+          eqDesc.textContent = 'CO₂가 물에 녹아 탄산(H₂CO₃)을 만들고 H⁺가 늘어나면서 용액이 점차 중성(초록색 계열)으로 변하고 있습니다.';
+        } else {
+          hudDot.className = 'w-3 h-3 rounded-full bg-amber-400 ring-2 ring-white/40';
+          hudLabel.textContent = '산성 (노란색 계열)';
+          btbBadge.className = 'text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+          btbBadge.textContent = '산성 · 노란색';
+          eqBox.className = 'mt-3 p-3 rounded-lg bg-amber-950/80 border border-amber-700/60 text-xs sm:text-sm';
+          eqTitle.className = 'font-bold text-amber-300';
+          eqTitle.textContent = '정반응 우세 / 산성화 (H⁺ 농도 높음)';
+          eqDesc.textContent = 'CO₂ 공급이 많아 르샤틀리에 원리에 따라 정반응(→)이 우세합니다. H⁺ 이온이 크게 늘어 BTB 용액이 노란색 계열로 변합니다.';
+        }
+      }
+
+      // ==========================================
+      // 5. Animation Loop
+      // ==========================================
+      let clockTime = 0;
+      let toastTimeout = null;
+
+      function showToast(msg) {
+        const toast = document.getElementById('scene-toast');
+        toast.textContent = msg;
+        toast.classList.remove('hidden');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toast.classList.add('hidden'), 2400);
+      }
+
+      function animate() {
+        requestAnimationFrame(animate);
+        clockTime += 0.016;
+
+        // Rotate magnetic stir bar gently
+        stirBar.rotation.y += 0.065;
+
+        // Subtle liquid surface ripple
+        const surfY = -1.51 + liquidHeight + Math.sin(clockTime * 2.5) * 0.005;
+        surfaceMesh.position.y = surfY;
+        meniscusMesh.position.y = surfY + 0.005;
+
+        // Animate splash ripples
+        for (let i = ripples.length - 1; i >= 0; i--) {
+          const rp = ripples[i];
+          rp.scale += 0.16;
+          rp.mesh.scale.set(rp.scale, rp.scale, 1);
+          rp.mat.opacity -= 0.028;
+          if (rp.mat.opacity <= 0) {
+            beakerGroup.remove(rp.mesh);
+            ripples.splice(i, 1);
+          }
+        }
+
+        // Animate Dry Ice Chunks falling & sublimating
+        for (let i = dryIceChunks.length - 1; i >= 0; i--) {
+          const chunk = dryIceChunks[i];
+          if (!chunk.inLiquid) {
+            chunk.vy -= 0.0045;
+            chunk.mesh.position.y += chunk.vy;
+            if (chunk.mesh.position.y <= 0.45) {
+              chunk.inLiquid = true;
+              chunk.vy = -0.024;
+              spawnRipple();
+            }
+          } else {
+            if (chunk.mesh.position.y > -1.3) {
+              chunk.mesh.position.y += chunk.vy;
+            }
+            chunk.life -= 0.0024;
+            if (state.co2Level < 100) {
+              state.co2Level = Math.min(100, state.co2Level + 0.085);
+              updateChemistryUI();
+            }
+            const scale = Math.max(0.01, chunk.life);
+            chunk.mesh.scale.set(scale, scale, scale);
+            chunk.mesh.rotation.x += chunk.rotSpeed.x;
+            chunk.mesh.rotation.y += chunk.rotSpeed.y;
+
+            if (chunk.life <= 0.02) {
+              beakerGroup.remove(chunk.mesh);
+              dryIceChunks.splice(i, 1);
+            }
+          }
+        }
+
+        // Animate CO2 Bubbles
+        const activeBubbleRatio = Math.min(
+          1,
+          (state.co2Level / 100) * 0.8 + (dryIceChunks.length > 0 ? 0.35 : 0.06)
+        );
+        const visibleBubbleCount = Math.max(3, Math.floor(bubbles.length * activeBubbleRatio));
+
+        for (let i = 0; i < bubbles.length; i++) {
+          const b = bubbles[i];
+          if (i >= visibleBubbleCount) {
+            b.mesh.visible = false;
+            continue;
+          }
+          b.mesh.visible = true;
+          const speedBoost = 1 + (state.co2Level / 100) * 1.15 + (dryIceChunks.length * 0.3);
+          b.mesh.position.y += b.speed * speedBoost;
+          b.mesh.position.x += Math.sin(clockTime * 3.2 + b.wobbleOffset) * 0.0035;
+
+          const progress = (b.mesh.position.y + 1.42) / liquidHeight;
+          const s = b.baseScale * (0.65 + progress * 0.65);
+          b.mesh.scale.set(s, s, s);
+
+          if (b.mesh.position.y >= 0.43) {
+            resetBubble(b.mesh, false);
+          }
+        }
+
+        // Animate CO2 Vapor Sprites (rising inside beaker, then spilling over rim & sinking!)
+        const mistIntensity = dryIceChunks.length > 0 ? 0.42 : (state.co2Level > 50 ? 0.16 : 0.0);
+        for (let i = 0; i < mistParticles.length; i++) {
+          const m = mistParticles[i];
+          if (mistIntensity <= 0.01) {
+            m.mat.opacity = 0;
+            continue;
+          }
+          if (m.spilling && m.sprite.position.y > 1.38) {
+            // Spill outward over rim & sink down because CO2 is denser than air
+            const dist = Math.hypot(m.sprite.position.x, m.sprite.position.z);
+            if (dist < 1.65) {
+              m.sprite.position.x += Math.cos(m.radialAngle) * 0.015;
+              m.sprite.position.z += Math.sin(m.radialAngle) * 0.015;
+              m.sprite.position.y += 0.002;
+            } else {
+              m.sprite.position.y -= 0.012;
+              m.sprite.position.x += Math.cos(m.radialAngle) * 0.004;
+              m.sprite.position.z += Math.sin(m.radialAngle) * 0.004;
+            }
+            const sinkFade = Math.max(0, (m.sprite.position.y + 1.4) / 2.8);
+            m.mat.opacity = mistIntensity * sinkFade;
+            if (m.sprite.position.y < -1.3) {
+              resetMist(m.sprite, false);
+            }
+          } else {
+            m.sprite.position.y += m.speed;
+            m.sprite.position.x += Math.sin(clockTime + m.phase) * 0.003;
+            const s = m.sprite.scale.x + 0.0025;
+            m.sprite.scale.set(s, s, 1);
+            const fade = Math.max(0, 1 - (m.sprite.position.y - 0.5) / 1.45);
+            m.mat.opacity = mistIntensity * fade;
+            if (m.sprite.position.y > 1.85) {
+              resetMist(m.sprite, false);
+            }
+          }
+        }
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // ==========================================
+      // 6. Controls & Tab Switching
+      // ==========================================
+      document.getElementById('co2-slider').addEventListener('input', (e) => {
+        state.co2Level = Number(e.target.value);
+        updateChemistryUI();
+      });
+
+      document.getElementById('btn-add-co2').addEventListener('click', () => {
+        state.co2Level = Math.min(100, state.co2Level + 15);
+        updateChemistryUI();
+      });
+
+      document.getElementById('btn-remove-co2').addEventListener('click', () => {
+        state.co2Level = Math.max(0, state.co2Level - 15);
+        updateChemistryUI();
+      });
+
+      document.getElementById('btn-drop-ice').addEventListener('click', () => {
+        state.iceDroppedCount += 1;
+        spawnDryIceChunk();
+        updateChemistryUI();
+        showToast('드라이아이스 투입! 승화하며 CO₂ 기포 발생 중');
+      });
+
+      document.getElementById('btn-reset-camera').addEventListener('click', () => {
+        state.camera.theta = 0.45;
+        state.camera.phi = 1.15;
+        state.camera.radius = 7.2;
+        updateCameraPosition();
+      });
+
+      document.getElementById('btn-reset-all').addEventListener('click', () => {
+        state.co2Level = 10;
+        state.iceDroppedCount = 0;
+        for (const chunk of dryIceChunks) {
+          beakerGroup.remove(chunk.mesh);
+        }
+        dryIceChunks.length = 0;
+        updateChemistryUI();
+      });
+
+      function switchTab(tabName) {
+        state.activeTab = tabName;
+        document.querySelectorAll('.tab-btn').forEach((btn) => {
+          const active = btn.dataset.tab === tabName;
+          btn.classList.toggle('border-blue-600', active);
+          btn.classList.toggle('text-blue-700', active);
+          btn.classList.toggle('bg-white', active);
+          btn.classList.toggle('border-transparent', !active);
+          btn.classList.toggle('text-slate-600', !active);
+        });
+        document.querySelectorAll('.tab-panel').forEach((panel) => {
+          panel.classList.toggle('hidden', panel.id !== `tab-${tabName}`);
+        });
+      }
+
+      document.querySelectorAll('.tab-btn').forEach((btn) => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      // ==========================================
+      // 7. Clinical Cases
+      // ==========================================
+      const clinicalCases = {
+        hyper: {
+          title: '사례 1. 과호흡 증후군 (호흡성 알칼리증)',
+          badge: 'CO₂ 과도 배출 → 역반응 우세',
+          badgeColor: 'bg-blue-100 text-blue-800',
+          situation: '불안이나 공황 상태로 호흡이 지나치게 빠르고 깊어지면서 혈액 속 CO₂가 평소보다 많이 배출된 상황입니다.',
+          equilibrium: '혈중 CO₂ 감소 → 르샤틀리에 원리에 의해 역반응 우세 → H⁺ 농도 감소 → 혈액 pH 상승(알칼리화).',
+          symptoms: '어지럼증, 손발 저림, 입 주변 감각 이상. (치료: 호흡 속도 늦추기 등 안정 유도)',
+          simCo2: 12
+        },
+        hypo: {
+          title: '사례 2. 저환기 · 만성 폐쇄성 폐질환 (호흡성 산증)',
+          badge: 'CO₂ 체내 축적 → 정반응 우세',
+          badgeColor: 'bg-amber-100 text-amber-800',
+          situation: '기도 폐쇄나 호흡 근력 저하로 폐 환기가 충분하지 않아 혈액 속 CO₂가 밖으로 배출되지 못하고 쌓인 상황입니다.',
+          equilibrium: '혈중 CO₂ 증가 → 정반응 우세 → 탄산(H₂CO₃) 및 H⁺ 농도 증가 → 혈액 pH 하강(산성화).',
+          symptoms: '두통, 졸림, 호흡 곤란, 의식 혼탁. (산소 공급 및 환기 개선 필요)',
+          simCo2: 88
+        },
+        co: {
+          title: '사례 3. 일산화탄소(CO) 중독',
+          badge: '헤모글로빈 결합 차단 → 조직 저산소증',
+          badgeColor: 'bg-rose-100 text-rose-800',
+          situation: '밀폐된 공간에서 불완전 연소로 발생한 일산화탄소(CO)를 흡입한 상황입니다. CO₂와 달리 혈액 산성화가 주원인이 아닙니다.',
+          equilibrium: 'CO가 산소(O₂)보다 약 200배 이상 강하게 헤모글로빈에 결합하여 조직으로의 산소 운반을 막습니다.',
+          symptoms: '심한 두통, 메스꺼움, 판단력 저하, 실신. (즉시 환기 및 고농도 산소 치료 필요)',
+          simCo2: 50
+        }
+      };
+
+      function renderClinicalCase(caseKey) {
+        state.activeCase = caseKey;
+        const c = clinicalCases[caseKey];
+        document.querySelectorAll('.case-btn').forEach((btn) => {
+          const active = btn.dataset.case === caseKey;
+          btn.className = active
+            ? 'case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition'
+            : 'case-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 transition';
+        });
+
+        const card = document.getElementById('clinical-card');
+        card.innerHTML = `
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <h4 class="text-sm sm:text-base font-bold text-slate-900">${c.title}</h4>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold ${c.badgeColor}">${c.badge}</span>
+          </div>
+          <div class="space-y-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+            <p><strong class="text-slate-900">임상 상황:</strong> ${c.situation}</p>
+            <p><strong class="text-slate-900">평형·생리 기전:</strong> ${c.equilibrium}</p>
+            <p><strong class="text-slate-900">주요 증상 및 대처:</strong> ${c.symptoms}</p>
+          </div>
+          <button id="btn-apply-case-sim" type="button"
+            class="mt-2 px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition">
+            3D 비커에 이 상태 반영하기 (CO₂ ${c.simCo2}%)
+          </button>
+        `;
+        document.getElementById('btn-apply-case-sim').addEventListener('click', () => {
+          state.co2Level = c.simCo2;
+          updateChemistryUI();
+        });
+      }
+
+      document.querySelectorAll('.case-btn').forEach((btn) => {
+        btn.addEventListener('click', () => renderClinicalCase(btn.dataset.case));
+      });
+      renderClinicalCase('hyper');
+
+      // ==========================================
+      // 8. Understanding Quiz
+      // ==========================================
+      const quizQuestions = [
+        {
+          q: '1. 염기성 BTB 용액(파란색)에 드라이아이스를 넣었을 때 일어나는 색상 변화 순서는?',
+          options: ['파란색 → 초록색 → 노란색', '노란색 → 초록색 → 파란색', '파란색 → 보라색 → 빨간색'],
+          answer: 0,
+          explain: 'CO₂가 물에 녹아 탄산(H₂CO₃)을 만들고 H⁺가 증가하여 용액이 산성화되므로 파란색 → 초록색 → 노란색 순으로 변합니다.'
+        },
+        {
+          q: '2. 용액 속 CO₂ 농도를 급격히 높였을 때, 르샤틀리에 원리에 따른 평형 이동 방향은?',
+          options: ['역반응(H⁺ 감소) 우세', '정반응(H⁺ 증가) 우세', '평형이 이동하지 않음'],
+          answer: 1,
+          explain: '반응물인 CO₂가 증가하면 이를 줄이는 방향인 정반응이 우세해져 H⁺ 이온이 늘어납니다.'
+        },
+        {
+          q: '3. 과호흡으로 체내 CO₂가 과도하게 배출되면 혈액의 pH는 어떻게 변할까요?',
+          options: ['H⁺가 증가하여 산성화(호흡성 산증)', 'H⁺가 감소하여 알칼리화(호흡성 알칼리증)', '변화 없음'],
+          answer: 1,
+          explain: 'CO₂가 줄어들면 역반응이 우세해져 H⁺ 농도가 낮아지고 혈액 pH가 상승합니다.'
+        },
+        {
+          q: '4. 일산화탄소(CO)가 인체에 치명적인 주된 이유는 무엇인가요?',
+          options: ['혈액의 pH를 즉시 산성으로 만들기 때문', '헤모글로빈에 산소보다 훨씬 강하게 결합해 산소 운반을 막기 때문', '폐포에서 물에 녹지 않기 때문'],
+          answer: 1,
+          explain: 'CO는 헤모글로빈과의 결합력이 O₂보다 약 200배 이상 높아 조직으로의 산소 공급을 차단합니다.'
+        },
+        {
+          q: '5. 혈액 속에서 산-염기 평형을 유지하는 핵심 완충 쌍은?',
+          options: ['NaCl / NaOH', 'H₂CO₃ / HCO₃⁻', 'CO / Hb'],
+          answer: 1,
+          explain: '혈액은 탄산(H₂CO₃)과 중탄산 이온(HCO₃⁻)의 완충 작용을 통해 pH를 일정하게 유지합니다.'
+        }
+      ];
+
+      function renderQuiz() {
+        const containerEl = document.getElementById('quiz-container');
+        containerEl.innerHTML = '';
+        let score = 0;
+
+        quizQuestions.forEach((item, idx) => {
+          const chosen = state.quizAnswers[idx];
+          if (chosen === item.answer) score += 1;
+
+          const card = document.createElement('div');
+          card.className = 'p-3.5 rounded-xl border border-slate-200 bg-slate-50/60 space-y-2';
+
+          const qText = document.createElement('div');
+          qText.className = 'text-xs sm:text-sm font-bold text-slate-900';
+          qText.textContent = item.q;
+          card.appendChild(qText);
+
+          const optList = document.createElement('div');
+          optList.className = 'space-y-1.5';
+
+          item.options.forEach((optText, oIdx) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            let style = 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100';
+            if (chosen !== undefined) {
+              if (oIdx === item.answer) {
+                style = 'bg-emerald-50 border-emerald-500 text-emerald-900 font-semibold';
+              } else if (oIdx === chosen) {
+                style = 'bg-rose-50 border-rose-400 text-rose-900';
+              }
+            }
+            btn.className = `w-full text-left px-3 py-2 rounded-lg border text-xs transition ${style}`;
+            btn.textContent = optText;
+            btn.addEventListener('click', () => {
+              state.quizAnswers[idx] = oIdx;
+              renderQuiz();
+            });
+            optList.appendChild(btn);
+          });
+          card.appendChild(optList);
+
+          if (chosen !== undefined) {
+            const fb = document.createElement('div');
+            const isCorrect = chosen === item.answer;
+            fb.className = `text-xs p-2 rounded-lg ${isCorrect ? 'bg-emerald-100/80 text-emerald-900' : 'bg-rose-100/80 text-rose-900'}`;
+            fb.textContent = (isCorrect ? '정답입니다! ' : '아쉽습니다. ') + item.explain;
+            card.appendChild(fb);
+          }
+
+          containerEl.appendChild(card);
+        });
+
+        document.getElementById('quiz-score-badge').textContent = `점수: ${score} / ${quizQuestions.length}`;
+      }
+
+      document.getElementById('btn-quiz-reset').addEventListener('click', () => {
+        state.quizAnswers = {};
+        renderQuiz();
+      });
+      renderQuiz();
+
+      // ==========================================
+      // 9. Presentation Mode (발표 모드)
+      // ==========================================
+      const presentationSteps = [
+        {
+          title: '1단계. 실험 목표 및 초기 상태 (염기성 BTB)',
+          script: '초기 BTB 용액은 CO₂가 적은 염기성 상태(파란색 계열)입니다. 비커를 드래그해 360도로 회전하며 입체 유리 비커와 용액을 살펴봅시다.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 10;
+            updateChemistryUI();
+          }
+        },
+        {
+          title: '2단계. 드라이아이스 투입과 CO₂ 승화·용해',
+          script: '고체 이산화탄소인 드라이아이스를 비커에 투입합니다. 용액 속으로 가라앉으며 기포가 올라오고 CO₂가 물에 녹기 시작합니다.',
+          action: () => {
+            switchTab('equilibrium');
+            state.iceDroppedCount += 1;
+            spawnDryIceChunk();
+            state.co2Level = 48;
+            updateChemistryUI();
+            showToast('발표 시연: 드라이아이스 투입!');
+          }
+        },
+        {
+          title: '3단계. 탄산 생성과 산성화 (파랑 → 초록 → 노랑)',
+          script: 'CO₂가 충분히 녹으면 탄산(H₂CO₃)과 수소 이온(H⁺)이 늘어나면서 용액이 초록색을 거쳐 노란색 계열(산성)로 변합니다.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 88;
+            updateChemistryUI();
+          }
+        },
+        {
+          title: '4단계. 르샤틀리에 원리와 평형 이동',
+          script: '반대로 CO₂를 제거하면 평형이 역반응 쪽으로 이동해 H⁺가 줄어들고 다시 파란색으로 돌아옵니다. 이것이 화학 평형의 동적 이동입니다.',
+          action: () => {
+            switchTab('equilibrium');
+            state.co2Level = 22;
+            updateChemistryUI();
+          }
+        },
+        {
+          title: '5단계. 인체 호흡과 O₂ · CO₂ · CO 비교',
+          script: '우리 혈액도 탄산-중탄산 완충계로 pH를 조절합니다. 산소(O₂), 이산화탄소(CO₂), 일산화탄소(CO)가 인체에 미치는 차이를 비교해 봅시다.',
+          action: () => {
+            switchTab('gases');
+          }
+        },
+        {
+          title: '6단계. 임상 사례 적용 및 이해도 퀴즈',
+          script: '과호흡과 저환기 사례를 3D 비커에 직접 반영해 본 뒤, 이해도 퀴즈로 학습 내용을 최종 점검하며 발표를 마무리합니다.',
+          action: () => {
+            switchTab('clinical');
+          }
+        }
+      ];
+
+      function renderPresentationStep() {
+        const idx = state.presentationStep;
+        const step = presentationSteps[idx];
+        document.getElementById('pres-step-badge').textContent = `${idx + 1} / ${presentationSteps.length} 단계`;
+        document.getElementById('pres-step-title').textContent = step.title;
+        document.getElementById('pres-step-script').textContent = step.script;
+        document.getElementById('btn-pres-prev').disabled = idx === 0;
+        document.getElementById('btn-pres-next').disabled = idx === presentationSteps.length - 1;
+        step.action();
+      }
+
+      function togglePresentationMode(forceState) {
+        state.presentationMode = forceState !== undefined ? forceState : !state.presentationMode;
+        const bar = document.getElementById('presentation-bar');
+        bar.classList.toggle('hidden', !state.presentationMode);
+        if (state.presentationMode) {
+          state.presentationStep = 0;
+          renderPresentationStep();
+        }
+      }
+
+      document.getElementById('btn-presentation-toggle').addEventListener('click', () => togglePresentationMode());
+      document.getElementById('btn-pres-close').addEventListener('click', () => togglePresentationMode(false));
+      document.getElementById('btn-pres-prev').addEventListener('click', () => {
+        if (state.presentationStep > 0) {
+          state.presentationStep -= 1;
+          renderPresentationStep();
+        }
+      });
+      document.getElementById('btn-pres-next').addEventListener('click', () => {
+        if (state.presentationStep < presentationSteps.length - 1) {
+          state.presentationStep += 1;
+          renderPresentationStep();
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (!state.presentationMode) return;
+        if (e.key === 'ArrowRight' && state.presentationStep < presentationSteps.length - 1) {
+          state.presentationStep += 1;
+          renderPresentationStep();
+        } else if (e.key === 'ArrowLeft' && state.presentationStep > 0) {
+          state.presentationStep -= 1;
+          renderPresentationStep();
+        }
+      });
+
+      // Initialize UI
+      updateChemistryUI();
+    })();
+  </script>
+</body>
+</html>
